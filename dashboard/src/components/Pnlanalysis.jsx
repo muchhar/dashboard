@@ -342,7 +342,7 @@ function Pnlanalysis() {
   return (
     <Container maxWidth={false} disableGutters  sx={{ ml: 1}} > {/* Align left with margin */}
       {/* Account Overview Title */}
-      <Stack direction="row" display={isWideSc?'flex':'flex'} alignItems="center" justifyContent="space-between" spacing={2} sx={{ pt: 2,mr:2 }}>
+      <Stack direction="row" display={isWideSc?'flex':'none'} alignItems="center" justifyContent="space-between" spacing={2} sx={{ pt: 2,mr:2 }}>
       <div className="flex flex-row items-center justify-between gap-4 w-full bg-[#0a0b0d] text-white text-base leading-6 font-sans">
       {/* Title */}
       <h2 className="text-2xl font-semibold leading-8 text-white ml-5 text-left">
@@ -461,45 +461,117 @@ function Pnlanalysis() {
 </Stack> 
 
 
-{/* <Stack direction="column" maxWidth={false} display={!isWideSc?'flex':'none'} alignItems="left" justifyContent="space-between" spacing={2} sx={{ pt: 1,mr:2 }}>
+<Stack direction="column" maxWidth={false} display={!isWideSc?'flex':'none'} alignItems="left" justifyContent="space-between" spacing={2} sx={{ pt: 1,mr:2 }}>
   <Typography variant="h5" fontWeight="bold" sx={{pl:2,textAlign:"left",width:'100%'}} >
   Profit & Loss Analysis
   </Typography>
   <Box sx={{pl:1.5}}>
-  <LocalizationProvider dateAdapter={AdapterDayjs}>
-   
-  <Button variant="outlined" startIcon={<CalendarTodayIcon />} sx={{color:'#637260',m:1,height:40,borderColor:'#404343',width:'100%'}} onClick={handleOpenCalendar}>
-    Select Date
-  </Button>
-  <Dialog open={open} onClose={handleCloseCalendar} >
-        <DialogContent>
-      <DateCalendar  />
-        </DialogContent>
-      </Dialog>
-      </LocalizationProvider>
-  <FormControl sx={{ m: 1, minWidth: 120,width:'100%' }} size="small">
-    <InputLabel id="demo-simple-select-label">Period</InputLabel>
- 
-      <Select
-        labelId="demo-select-small-label"
-        id="demo-select-small"
-        value={Symbols}
-        label="Period"
-        onChange={handleChange2}
-      >
-        <MenuItem value={10}>All Time</MenuItem>
-        <MenuItem value={20}>This Year</MenuItem>
-        <MenuItem value={30}>This Quarter</MenuItem>
-        <MenuItem value={20}>This Month</MenuItem>
-        
-      </Select>
-    </FormControl>
-  
-  <Button variant="outlined" startIcon={<FileDownloadOutlinedIcon />} sx={{color:'#ffffff',m:1,height:40,borderColor:'#404343',width:'100%'}}>
-    Export
-  </Button>
+  <div className="relative ">
+          <button
+            onClick={() => setIsCalendarOpen(!isCalendarOpen)}
+            style={{height:'40px'}}
+            className="color-[#637260] flex w-full items-center justify-start gap-2 bg-[#1e2026] text-white text-base leading-6 cursor-pointer transition-all duration-150 border border-[#637260] rounded-lg px-4 py-2 hover:border-[#80ee64]"
+          >
+            <CalendarTodayIcon className="text-[#637260]" />
+            Select Date
+          </button>
+
+          {/* Calendar Dropdown */}
+          {isCalendarOpen && (
+            <div className="absolute right-0 z-10 mt-2 w-80 bg-[#1e2026] shadow-lg border border-[#2c2f36] rounded-lg p-4">
+              {/* Calendar Header */}
+              <div className="flex items-center justify-between mb-4">
+                <button
+                  onClick={() => changeMonth(-1)}
+                  className="p-1 text-white bg-transparent cursor-pointer rounded-full"
+                >
+                  <Icon1 className="text-[#a7b1c2]" />
+                </button>
+                <h3 className="text-base font-medium text-white m-0">
+                  {currentDate.toLocaleString("default", { month: "long" })}{" "}
+                  {currentDate.getFullYear()}
+                </h3>
+                <button
+                  onClick={() => changeMonth(1)}
+                  className="p-1 text-white bg-transparent cursor-pointer rounded-full"
+                >
+                  <Icon2 className="text-[#a7b1c2]" />
+                </button>
+              </div>
+
+              {/* Calendar Grid */}
+              <div className="grid grid-cols-7 gap-1">
+                {/* Weekday Headers */}
+                {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
+                  <div
+                    key={day}
+                    className="py-1 text-center text-xs leading-4 text-[#a7b1c2]"
+                  >
+                    {day}
+                  </div>
+                ))}
+
+                {/* Calendar Days */}
+                {calendarDays2}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Time Range Select */}
+         <Box>
+                  <div className="w-full">
+              <div className="relative">
+                <select
+                  id="period-select"
+                  value={Period}
+                  onChange={handleChange}
+                  className="
+                    w-full px-5 py-2
+                    bg-[#212525] border border-[#637260] rounded-lg
+                    text-[#ddffdc] text-sm
+                    appearance-none
+                    hover:border-[#80ee64] focus:border-[#80ee64] focus:outline-none
+                    transition-colors duration-200
+                  "
+                >
+                  <option value={10} className="bg-[#212525] text-[#ddffdc]">
+                    Last 7 Days
+                  </option>
+                  <option value={20} className="bg-[#212525] text-[#ddffdc]">
+                    Last 30 Days
+                  </option>
+                  <option value={30} className="bg-[#212525] text-[#ddffdc]">
+                    Last 90 Days
+                  </option>
+                </select>
+                {/* Custom Dropdown Arrow */}
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[#ddffdc]">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            </Box>
+        {/* Export Button */}
+        <button style={{height:'40px'}} className="flex items-center justify-center gap-2 bg-[#1e2026] text-white text-base leading-6 cursor-pointer transition-all duration-150 border border-[#637260] rounded-lg px-4 py-2 hover:border-[#80ee64]">
+          <FileDownloadOutlinedIcon className="text-[#a7b1c2]" />
+          Export
+        </button>
   </Box>
-</Stack>  */}
+</Stack> 
 <Grid container   sx={{ mt: 2.5, ml: 1,pr:2 }} >
       {/* Total P&L Card */}
       <Grid  sx={{ width: cardWidth }}>
