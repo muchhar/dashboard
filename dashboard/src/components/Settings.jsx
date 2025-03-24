@@ -32,12 +32,12 @@ const Settings = () => {
   ];
 
   return (
-    <Container maxWidth={false} disableGutters  sx={{ ml: 9,mt:1.5, width:'100%'}}>
+    <Container maxWidth={false} disableGutters  sx={{ ml: 1,mt:1.5, width:'100%'}}>
     <Typography variant="h5" fontWeight="bold" sx={{pl:2,textAlign:'left',pt:1}} >
     Settings
       </Typography>
       
-    <Card sx={{ mt:2,ml:2,mr:18,height:50,borderRadius:4,backgroundColor:'#151818' }}>
+    <Card sx={{ mt:2,ml:2,mr:4,height:50,borderRadius:4,backgroundColor:'#151818' }}>
       {/* Title */}
      
       {/* Tabs */}
@@ -80,10 +80,10 @@ const Settings = () => {
 
       {/* Tab Content */}
      </Card>
-     <Box sx={{display: activeTab==0?'flex':'none',mt:3,ml:2,mr:18,borderRadius:3}}>
+     <Box sx={{display: activeTab==0?'flex':'none',mt:3,ml:2,mr:4,borderRadius:3}}>
      
     
-     <div className="w-full bg-[#151818] border-[#637260] rounded-2xl p-8 text-white shadow-lg flex-grow"><h2 className="text-xl font-bold mb-8 text-left">Account Information</h2>
+     <div className="w-full bg-[#151818] border border-[#637260] rounded-2xl p-8 text-white shadow-lg flex-grow"><h2 className="text-xl font-bold mb-8 text-left">Account Information</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
           <label htmlFor="fullName" className="block text-gray-300 mb-2 text-left">
@@ -176,7 +176,7 @@ const Settings = () => {
       </div></div>
     </div>
     </Box>
-    <Box sx={{display: activeTab==1?'flex':'none',mt:3,ml:2,mr:18,borderRadius:3}}>
+    <Box sx={{display: activeTab==1?'flex':'none',mt:3,ml:2,mr:4,borderRadius:3}}>
     <div className="mt-0 mb-0 w-full bg-[#0A0B0D] text-white text-base leading-6 font-sans">
       {/* Change Password Section */}
       <div className="bg-[#151818] border-[#637260] border  rounded-xl p-6">
@@ -260,7 +260,7 @@ const Settings = () => {
       </div>
     </div>
     </Box>
-    <Box sx={{display: activeTab==2?'flex':'none',mt:3,ml:2,mr:18,borderRadius:3}}>
+    <Box sx={{display: activeTab==2?'flex':'none',mt:3,ml:2,mr:4,borderRadius:3}}>
     <div className="mt-0 bg-[#151818] border border-[#637260] rounded-xl p-6 w-full text-white text-base leading-6 font-sans">
       {/* Notification Preferences Section */}
       <h3 className="text-lg font-semibold leading-7 mb-6 text-left">Notification Preferences</h3>
@@ -351,7 +351,7 @@ const Settings = () => {
       </div>
     </div>
       </Box>
-      <Box sx={{display: activeTab==3?'flex':'none',mt:3,ml:2,mr:18,borderRadius:3}}>
+      <Box sx={{display: activeTab==3?'flex':'none',mt:3,ml:2,mr:4,borderRadius:3}}>
       <div className="mt-0 bg-[#151818] border border-[#637260] rounded-xl p-6 w-full text-white text-base leading-6 font-sans">
      <h3 className="text-lg font-semibold leading-7 mb-6 text-left">Display Preferences</h3>
       <div>
@@ -422,7 +422,7 @@ const Settings = () => {
       </div>
     </div>
       </Box>
-      <Box sx={{display: activeTab==4?'flex':'none',mt:3,ml:2,mr:18,borderRadius:3}}>
+      <Box sx={{display: activeTab==4?'flex':'none',mt:3,ml:2,mr:4,borderRadius:3}}>
       <div className="mt-0 w-full bg-[#0A0B0D] text-white text-base leading-6 font-sans">
       {/* Current Plan Section */}
       <div className="bg-[#151818] border border-[#637260] rounded-xl p-6">

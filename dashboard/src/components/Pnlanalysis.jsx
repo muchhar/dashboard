@@ -340,9 +340,9 @@ function Pnlanalysis() {
   };
   
   return (
-    <Container maxWidth={false} disableGutters  sx={{ ml: 8}} > {/* Align left with margin */}
+    <Container maxWidth={false} disableGutters  sx={{ ml: 1}} > {/* Align left with margin */}
       {/* Account Overview Title */}
-      <Stack direction="row" display={isWideSc?'flex':'none'} alignItems="center" justifyContent="space-between" spacing={2} sx={{ pt: 2,mr:18 }}>
+      <Stack direction="row" display={isWideSc?'flex':'none'} alignItems="center" justifyContent="space-between" spacing={2} sx={{ pt: 2,mr:2 }}>
       <div className="flex flex-row items-center justify-between gap-4 w-full bg-[#0a0b0d] text-white text-base leading-6 font-sans">
       {/* Title */}
       <h2 className="text-2xl font-semibold leading-8 text-white ml-5 text-left">
@@ -500,7 +500,7 @@ function Pnlanalysis() {
   </Button>
   </Box>
 </Stack> 
-<Grid container   sx={{ mt: 2.5, ml: 2,pr:18 }} >
+<Grid container   sx={{ mt: 2.5, ml: 1,pr:2 }} >
       {/* Total P&L Card */}
       <Grid  sx={{ width: cardWidth }}>
         <Card
@@ -675,7 +675,7 @@ function Pnlanalysis() {
       spacing={2} // Add spacing between cards
       alignItems="center"
       justifyContent="space-between"
-      sx={{pt:2,ml:3,pr:17}}
+      sx={{pt:2,ml:1,pr:2}}
     >
       {/* Cumulative Performance Card */}
       <Card
@@ -764,7 +764,7 @@ function Pnlanalysis() {
 
       <Stack direction={isWideScreen ? 'row' : 'column'} spacing={2} // Add spacing between cards
       // Horizontal on wide screens, vertical on smaller screens
-       alignItems="stretch" justifyContent="space-between" sx={{pt:2,ml:3,mr:17}}>
+       alignItems="stretch" justifyContent="space-between" sx={{pt:2,ml:1,mr:2}}>
    
    <Card sx={{ p: 0.5, mb: 1,ml:4,my:0, boxShadow: 3,width:'100%',  backgroundColor: '#151818', borderRadius: 5,border:1,borderColor:'#637260',
         
@@ -860,7 +860,7 @@ function Pnlanalysis() {
 
 
 
-           <Card sx={{ p: 0.5, mb: 1,ml:3,mr:17,my:2, boxShadow: 3,  backgroundColor: '#151818', borderRadius: 5,border:1,borderColor:'#637260',
+           <Card sx={{ p: 0.5, mb: 1,ml:1,mr:2,my:2, boxShadow: 3,  backgroundColor: '#151818', borderRadius: 5,border:1,borderColor:'#637260',
         
     }}> {/* Limit width */}
      <CardContent>

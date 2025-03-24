@@ -53,7 +53,7 @@ const LiveDropdown = () => {
     drawdown:`-$${Math.floor(Math.random() * 100000)} (${Math.floor(Math.random() * 100)})` , // Random drawdown between 0 and 100
   }));
   return (
-    <Box sx={{  textAlign: "left",ml:11,mt:2,mr:11 }}>
+    <Box sx={{  textAlign: "left",ml:2,mt:2,mr:2 }}>
       <Typography variant="h5"  fontWeight="bold" gutterBottom sx={{ textAlign: 'left',ml:0,pt:1 }}>
               Live Dropdown
       </Typography>
