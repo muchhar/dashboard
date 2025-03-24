@@ -162,10 +162,10 @@ function Analytics() {
   };
   
   return (
-    <Container maxWidth={false} disableGutters  sx={{mr:6,ml:10,mt:1,  width:'100%'}} > {/* Align left with margin */}
+    <Container maxWidth={false} disableGutters  sx={{mr:1,ml:1,mt:1,  width:'100%'}} > {/* Align left with margin */}
       {/* Account Overview Title */}
-      <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2} sx={{ pt: 1,pb:0.5,mr:20 }}>
-  <Typography variant="h5" fontWeight="bold" sx={{pl:2}} >
+      <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2} sx={{ pt: 1,pb:0.5,mr:2 }}>
+  <Typography variant="h5" fontWeight="bold" sx={{pl:1}} >
   Trading Analytics
       
   </Typography>
@@ -222,7 +222,7 @@ function Analytics() {
       spacing={2} // Add spacing between cards
       alignItems="center"
       justifyContent="space-between"
-      sx={{pt:2,ml:0,mr:20}}
+      sx={{pt:2,ml:0,mr:2}}
     >
       {/* Cumulative Performance Card */}
       <Card
@@ -307,7 +307,7 @@ function Analytics() {
 
       <Stack direction={isWideScreen ? 'row' : 'column'} spacing={2}  // Add spacing between cards
       // Horizontal on wide screens, vertical on smaller screens
-       alignItems="center" justifyContent="space-between" sx={{pt:2,ml:0,mr:20}}>
+       alignItems="center" justifyContent="space-between" sx={{pt:2,ml:0,mr:2}}>
       <Card sx={{ p: 0.5, mb: 1,ml:0,my:2, boxShadow: 3,width:'100%',  backgroundColor: '#151818', borderRadius: 5,border:1,borderColor:'#637260',
         
     }}> {/* Limit width */}
@@ -377,7 +377,7 @@ function Analytics() {
       </Stack>
      
       {/* Trading Account Card */}
-       <Card sx={{ p: 0.5, mb: 1,ml:0,mr:20,my:2, boxShadow: 3,  backgroundColor: '#151818', borderRadius: 5,border:1,borderColor:'#637260',
+       <Card sx={{ p: 0.5, mb: 1,ml:0,mr:2,my:2, boxShadow: 3,  backgroundColor: '#151818', borderRadius: 5,border:1,borderColor:'#637260',
         
     }}> {/* Limit width */}
      <CardContent>

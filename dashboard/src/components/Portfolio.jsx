@@ -124,10 +124,10 @@ function Portfolio() {
     setSymobl(event.target.value);
   };
   return (
-    <Container maxWidth={false} disableGutters  sx={{ ml: 8,mt:1}} > {/* Align left with margin */}
+    <Container maxWidth={false} disableGutters  sx={{ ml: 1,mt:1}} > {/* Align left with margin */}
       {/* Account Overview Title */}
-      <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2} sx={{ pt: 1 ,mr:18}}>
-  <Typography variant="h5" fontWeight="bold" sx={{pl:4}} >
+      <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2} sx={{ pt: 1 ,mr:2}}>
+  <Typography variant="h5" fontWeight="bold" sx={{pl:3}} >
   Portfolio Overview
   </Typography>
   <Box>
@@ -181,7 +181,7 @@ function Portfolio() {
     </Box>
 </Stack> 
      
-<Card sx={{ p: 0.5, mb: 1,ml:2,my:2,mr:18, boxShadow: 3,  backgroundColor: '#151818', borderRadius: 5,border:1,borderColor:'#637260',
+<Card sx={{ p: 0.5, mb: 1,ml:2,my:2,mr:2, boxShadow: 3,  backgroundColor: '#151818', borderRadius: 5,border:1,borderColor:'#637260',
         
     }}> {/* Limit width */}
      <CardContent>
@@ -453,7 +453,7 @@ function Portfolio() {
     
       </CardContent>
    </Card>
-   <Card sx={{ p: 0.5, mb: 1,ml:2,my:2,mr:18, boxShadow: 3,width:'100%',  backgroundColor: '#151818', borderRadius: 5,border:1,borderColor:'#637260',
+   <Card sx={{ p: 0.5, mb: 1,ml:2,my:2,mr:2, boxShadow: 3,width:'100%',  backgroundColor: '#151818', borderRadius: 5,border:1,borderColor:'#637260',
         
     }}> {/* Limit width */}
      <CardContent>
@@ -487,7 +487,7 @@ function Portfolio() {
 
        
 
-            <Card sx={{ p: 0.5, mb: 1,ml:2,my:2,mr:18, boxShadow: 3,  backgroundColor: '#151818', borderRadius: 5,border:1,borderColor:'#637260',
+            <Card sx={{ p: 0.5, mb: 1,ml:2,my:2,mr:2, boxShadow: 3,  backgroundColor: '#151818', borderRadius: 5,border:1,borderColor:'#637260',
         
     }}> {/* Limit width */}
      <CardContent>
