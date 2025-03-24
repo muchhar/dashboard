@@ -78,13 +78,13 @@ function Dashboard() {
   };
   return (
     
-    <Container   maxWidth={false}  sx={{ ml:isWideScreen? 6:1,mt:1,mr: isWideScreen?6:1}} > {/* Align left with margin */}
+    <Container   maxWidth={false}  sx={{ ml:1,mt:1,mr: 1}} > {/* Align left with margin */}
       {/* Account Overview Title */}
-      <Typography variant="h5"  fontWeight="bold" gutterBottom sx={{ textAlign: 'left',ml:3,pt:1 }}>
+      <Typography variant="h5"  fontWeight="bold" gutterBottom sx={{ textAlign: 'left',ml:1,pt:1 }}>
         Account Overview
       </Typography>
       {/* Trading Account Card */}
-      <Card sx={{mr:isWideScreen?13:1, p: 0.5, mb: 1,ml:2,my:2, boxShadow: 3,  maxWidth: isMobile ? '100%' : 400,  backgroundColor: '#151818', borderRadius: 5,border:1,borderColor:'#637260',
+      <Card sx={{mr:1, p: 0.5, mb: 1,ml:0,my:2, boxShadow: 3,  maxWidth: isMobile ? '100%' : 400,  backgroundColor: '#151818', borderRadius: 5,border:1,borderColor:'#637260',
         transition: 'border-color 0.3s ease', // Smooth transition
         '&:hover': {
           borderColor: '#80ee64', // Change color on hover
@@ -199,10 +199,10 @@ function Dashboard() {
           </Box>
         </CardContent>
       </Card>
-      <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ textAlign: 'left',ml:3 }}>
+      <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ textAlign: 'left',ml:1 }}>
         Portfolio Analytics
       </Typography>
-      <Grid container spacing={2} sx={{ mt: 1, ml: 0,mr:6,pr:15 }}>
+      <Grid container spacing={2} sx={{ mt: 1, ml: 0,pr:1 }}>
       {[
         { title: 'Total Profit', value: '$2047.902', icon: <ShowChartIcon color="#4caf50" /> },
         { title: 'Win Rate', value: '80.02%', icon: <PortfolioIcon color="#0D49D6" /> },
@@ -253,11 +253,11 @@ function Dashboard() {
     </Grid>
 
       
-        <Typography variant="h5"  fontWeight="bold" gutterBottom sx={{ textAlign: 'left',ml:3,mt:2 }}>
+        <Typography variant="h5"  fontWeight="bold" gutterBottom sx={{ textAlign: 'left',ml:1,mt:2 }}>
         Performance Overview
       </Typography>
       {/* Trading Account Card */}
-      <Card sx={{ mr:13, mb: 1,ml:2,my:2, boxShadow: 3,p:0.5,  backgroundColor: '#151818', borderRadius: 5,border:1,borderColor:'#637260',
+      <Card sx={{ mr:1, mb: 1,ml:1,width:'100%',my:2, boxShadow: 3,p:0.5,  backgroundColor: '#151818', borderRadius: 5,border:1,borderColor:'#637260',
         
        }}> {/* Limit width */}
         <CardContent >
@@ -278,11 +278,11 @@ function Dashboard() {
          </CardContent>
       </Card>
       
-      <Typography variant="h5"  fontWeight="bold" gutterBottom sx={{ textAlign: 'left',ml:3,mt:2 }}>
+      <Typography variant="h5"  fontWeight="bold" gutterBottom sx={{ textAlign: 'left',ml:1,mt:2 }}>
       Open Positions
       </Typography>
       {/* Trading Account Card */}
-      <Card sx={{mr:13, p: 0.5, mb: 1,ml:2,my:2, boxShadow: 3,  backgroundColor: '#151818', borderRadius: 5,border:1,borderColor:'#637260',
+      <Card sx={{mr:1, p: 0.5, mb: 1,ml:1,width:'100%',my:2, boxShadow: 3,  backgroundColor: '#151818', borderRadius: 5,border:1,borderColor:'#637260',
         
        }}> {/* Limit width */}
         <CardContent>
@@ -414,15 +414,16 @@ function Dashboard() {
 </TableContainer>
          </CardContent>
       </Card>
-        <Typography variant="h5"  fontWeight="bold" sx={{ textAlign: 'left',ml:3,mt:2 }}>
+        <Typography variant="h5"  fontWeight="bold" sx={{ textAlign: 'left',ml:1,mt:2 }}>
         Day Performance
       </Typography>
       <Card
       sx={{
-        mr:13,
+        mr:1,
         p: 0.5,
         mb: 1,
-        ml: 2,
+        ml: 1,
+        width:'100%',
         my: 2,
         boxShadow: 3,
         backgroundColor: '#151818',
@@ -552,16 +553,17 @@ function Dashboard() {
 
 
 
-      <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ textAlign: 'left',ml:3,mt:2 }}>
+      <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ textAlign: 'left',ml:1,mt:2 }}>
       Trading Sessions
       </Typography>
       {/* Trading Account Card */}
       <Card
       sx={{
-        mr:13,
+        mr:1,
         p: 0.5,
         mb: 1,
-        ml: 2,
+        ml: 1,
+        width:'100%',
         my: 2,
         boxShadow: 3,
         backgroundColor: '#151818',
