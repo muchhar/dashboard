@@ -78,13 +78,13 @@ function Dashboard() {
   };
   return (
     
-    <Container   maxWidth={false} marginRight={6} sx={{ ml: 6,mt:1,mr: 6}} > {/* Align left with margin */}
+    <Container   maxWidth={false}  sx={{ ml:isWideScreen? 6:1,mt:1,mr: isWideScreen?6:1}} > {/* Align left with margin */}
       {/* Account Overview Title */}
       <Typography variant="h5"  fontWeight="bold" gutterBottom sx={{ textAlign: 'left',ml:3,pt:1 }}>
         Account Overview
       </Typography>
       {/* Trading Account Card */}
-      <Card sx={{mr:13, p: 0.5, mb: 1,ml:2,my:2, boxShadow: 3,  maxWidth: isMobile ? '100%' : 400,  backgroundColor: '#151818', borderRadius: 5,border:1,borderColor:'#637260',
+      <Card sx={{mr:isWideScreen?13:1, p: 0.5, mb: 1,ml:2,my:2, boxShadow: 3,  maxWidth: isMobile ? '100%' : 400,  backgroundColor: '#151818', borderRadius: 5,border:1,borderColor:'#637260',
         transition: 'border-color 0.3s ease', // Smooth transition
         '&:hover': {
           borderColor: '#80ee64', // Change color on hover
