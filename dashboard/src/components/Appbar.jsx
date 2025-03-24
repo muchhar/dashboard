@@ -120,15 +120,14 @@ const AppBar = () => {
         </div>
 
         {/* Sign Up Button */}
-        <nav>
-
+       
         <NavLink
-          href="/login-signup"
+          to="/login-signup"
           className="bg-[#80ee64] text-[#020617] leading-6 cursor-pointer block text-center text-base font-medium transition-opacity duration-200 ease-in-out border border-[#80ee64] rounded-[100px] py-3 px-8 no-underline whitespace-nowrap"
         >
           Sign Up
         </NavLink>
-        </nav>
+       
       </div>
 
       {/* Menu Icon (Visible on smaller screens) */}
@@ -207,13 +206,13 @@ const AppBar = () => {
             Settings
           </NavLink>
           {/* Sign Up Button in Dropdown */}
-          <a
-            href="/login-signup"
+          <NavLink
+            to="/login-signup"
             className="block text-white py-2"
             onClick={() => setIsMenuOpen(false)}
           >
             Sign Up
-          </a>
+          </NavLink>
         </div>
       )}
     </div>

@@ -202,7 +202,7 @@ function Dashboard() {
       <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ textAlign: 'left',ml:1 }}>
         Portfolio Analytics
       </Typography>
-      <Grid container spacing={2} sx={{ mt: 1, ml: 0,pr:1 }}>
+      <Grid container spacing={2} sx={{ mt: 1, ml: -1,pr:1 }}>
       {[
         { title: 'Total Profit', value: '$2047.902', icon: <ShowChartIcon color="#4caf50" /> },
         { title: 'Win Rate', value: '80.02%', icon: <PortfolioIcon color="#0D49D6" /> },

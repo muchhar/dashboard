@@ -106,9 +106,9 @@ function History() {
     setDate(event.target.value);
   };
   return (
-    <Container maxWidth={false} disableGutters  sx={{ ml: 10,mr:18,pr:6 }} > {/* Align left with margin */}
+    <Container maxWidth={false} disableGutters  sx={{ ml: 1,mr:1,pr:1 }} > {/* Align left with margin */}
       {/* Account Overview Title */}
-      <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2} sx={{ pt: 2,mr:14 }}>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2} sx={{ pt: 2,mr:3 }}>
   <Typography variant="h5" fontWeight="bold" sx={{pl:2}} >
     Trade History
   </Typography>
@@ -138,7 +138,7 @@ function History() {
 <Stack
       direction={isWideScreen ? 'row' : 'column'} // Horizontal on wide screens, vertical on smaller screens
       spacing={2} // Add spacing between cards
-      sx={{ mt: 2.5, ml: 2, pt: 1,mr:14 }}
+      sx={{ mt: 1, ml: 2, pt: 1,mr:3 }}
     >
       {/* Total Trades Card */}
       <Card
@@ -259,7 +259,7 @@ function History() {
  
       
       {/* Trading Account Card */}
-      <Card sx={{mr:14, p: 0.5, mb: 1,ml:2,my:2, boxShadow: 3,  backgroundColor: '#151818', borderRadius: 5,border:1,borderColor:'#637260',
+      <Card sx={{mr:3, p: 0.5, mb: 1,ml:2,my:2, boxShadow: 3,  backgroundColor: '#151818', borderRadius: 5,border:1,borderColor:'#637260',
         
        }}> {/* Limit width */}
         <CardContent>
