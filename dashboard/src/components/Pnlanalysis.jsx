@@ -342,7 +342,7 @@ function Pnlanalysis() {
   return (
     <Container maxWidth={false} disableGutters  sx={{ ml: 1}} > {/* Align left with margin */}
       {/* Account Overview Title */}
-      <Stack direction="row" display={isWideSc?'flex':'none'} alignItems="center" justifyContent="space-between" spacing={2} sx={{ pt: 2,mr:2 }}>
+      <Stack direction="row" display={isWideSc?'flex':'flex'} alignItems="center" justifyContent="space-between" spacing={2} sx={{ pt: 2,mr:2 }}>
       <div className="flex flex-row items-center justify-between gap-4 w-full bg-[#0a0b0d] text-white text-base leading-6 font-sans">
       {/* Title */}
       <h2 className="text-2xl font-semibold leading-8 text-white ml-5 text-left">
@@ -461,8 +461,8 @@ function Pnlanalysis() {
 </Stack> 
 
 
-<Stack direction="column" maxWidth={false} display={!isWideSc?'flex':'none'} alignItems="left" justifyContent="space-between" spacing={2} sx={{ pt: 1 }}>
-  <Typography variant="h5" fontWeight="bold" sx={{pl:2,textAlign:"left"}} >
+{/* <Stack direction="column" maxWidth={false} display={!isWideSc?'flex':'none'} alignItems="left" justifyContent="space-between" spacing={2} sx={{ pt: 1,mr:2 }}>
+  <Typography variant="h5" fontWeight="bold" sx={{pl:2,textAlign:"left",width:'100%'}} >
   Profit & Loss Analysis
   </Typography>
   <Box sx={{pl:1.5}}>
@@ -499,7 +499,7 @@ function Pnlanalysis() {
     Export
   </Button>
   </Box>
-</Stack> 
+</Stack>  */}
 <Grid container   sx={{ mt: 2.5, ml: 1,pr:2 }} >
       {/* Total P&L Card */}
       <Grid  sx={{ width: cardWidth }}>
