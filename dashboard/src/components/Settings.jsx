@@ -37,49 +37,62 @@ const Settings = () => {
     Settings
       </Typography>
       
-    <Card sx={{ mt:2,ml:2,mr:4,height:50,borderRadius:4,backgroundColor:'#151818' }}>
-      {/* Title */}
-     
-      {/* Tabs */}
-      <Tabs
-        value={activeTab}
-        onChange={handleTabChange}
-        variant="fullWidth"
-        sx={{
-          "& .MuiTabs-indicator": {
-          display: "none", // Hide the indicator (underline)
+      <Card sx={{ mt: 2, ml: 2, mr: 4, borderRadius: 4, backgroundColor: '#151818' }}>
+  {/* Tabs */}
+  <Tabs
+    value={activeTab}
+    onChange={handleTabChange}
+    variant="scrollable" // Changed from "fullWidth" to allow wrapping
+    scrollButtons="auto" // Adds scroll buttons when needed
+    allowScrollButtonsMobile
+    sx={{
+      "& .MuiTabs-flexContainer": {
+        flexWrap: 'wrap', // Allows tabs to wrap to new line
+        gap: '8px', // Adds spacing between tabs
+      },
+      "& .MuiTabs-indicator": {
+        display: "none",
+      },
+      "& .MuiTab-root": {
+        textTransform: "none",
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-start",
+        gap: 1,
+        padding: "10px 16px",
+        minHeight: "48px",
+        minWidth: "120px",
+        flex: '1 0 auto', // Allows tabs to grow but not shrink below content width
+        backgroundColor: "transparent",
+        "&.Mui-selected": {
+          backgroundColor: "#4CAF4F",
+          color: "white",
         },
-          "& .MuiTab-root": {
-            textTransform: "none",
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "flex-start",
-            gap: 1,
-            padding: "10px 16px",
-            minHeight: "48px",
-            minWidth: "120px",
-            backgroundColor: "transparent",
-            "&.Mui-selected": {
-              backgroundColor: "#4CAF4F",
-              color: "white",
-            },
-          },
-        }}
-      >
-        {tabs.map((tab, index) => (
-          <Tab
-            key={index}
-            label={tab.label}
-            icon={tab.icon}
-            iconPosition="start"
-            sx={{height:50,width:'auto'}}
-          />
-        ))}
-      </Tabs>
+        // Responsive adjustments
+        '@media (max-width: 768px)': {
+          minWidth: '100px', // Smaller min-width on mobile
+          padding: '8px 12px',
+        },
+        '@media (max-width: 480px)': {
+          flexBasis: 'calc(50% - 8px)', // 2 tabs per row on very small screens
+        }
+      },
+    }}
+  >
+    {tabs.map((tab, index) => (
+      <Tab
+        key={index}
+        label={tab.label}
+        icon={tab.icon}
+        iconPosition="start"
+        sx={{ height: 50, width: 'auto' }}
+      />
+    ))}
+  </Tabs>
 
-      {/* Tab Content */}
-     </Card>
+  {/* Tab Content */}
+</Card>
      <Box sx={{display: activeTab==0?'flex':'none',mt:3,ml:2,mr:4,borderRadius:3}}>
      
     

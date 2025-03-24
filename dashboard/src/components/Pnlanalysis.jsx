@@ -461,12 +461,12 @@ function Pnlanalysis() {
 </Stack> 
 
 
-<Stack direction="column" maxWidth={false} display={!isWideSc?'flex':'none'} alignItems="left" justifyContent="space-between" spacing={2} sx={{ pt: 1,mr:2 }}>
+<Stack direction="column" maxWidth={true} width={'100%'} display={!isWideSc?'flex':'none'} alignItems="left" justifyContent="space-between" spacing={2} sx={{ pt: 1,mr:2 }}>
   <Typography variant="h5" fontWeight="bold" sx={{pl:2,textAlign:"left",width:'100%'}} >
   Profit & Loss Analysis
   </Typography>
   <Box sx={{pl:1.5}}>
-  <div className="relative ">
+  <div className="relative w-full pr-5">
           <button
             onClick={() => setIsCalendarOpen(!isCalendarOpen)}
             style={{height:'40px'}}
@@ -520,14 +520,14 @@ function Pnlanalysis() {
 
         {/* Time Range Select */}
          <Box>
-                  <div className="w-full">
+                  <div className="w-full pr-5 pt-2">
               <div className="relative">
                 <select
                   id="period-select"
                   value={Period}
                   onChange={handleChange}
                   className="
-                    w-full px-5 py-2
+                    w-full px-5 py-2 
                     bg-[#212525] border border-[#637260] rounded-lg
                     text-[#ddffdc] text-sm
                     appearance-none
@@ -566,10 +566,12 @@ function Pnlanalysis() {
             </div>
             </Box>
         {/* Export Button */}
-        <button style={{height:'40px'}} className="flex items-center justify-center gap-2 bg-[#1e2026] text-white text-base leading-6 cursor-pointer transition-all duration-150 border border-[#637260] rounded-lg px-4 py-2 hover:border-[#80ee64]">
+        <div className='w-full pr-5'>
+        <button style={{height:'40px',marginTop:'8px'}} className="w-full flex items-center justify-center gap-2 bg-[#1e2026] text-white text-base leading-6 cursor-pointer transition-all duration-150 border border-[#637260] rounded-lg px-4 py-2 hover:border-[#80ee64]">
           <FileDownloadOutlinedIcon className="text-[#a7b1c2]" />
           Export
         </button>
+        </div>
   </Box>
 </Stack> 
 <Grid container   sx={{ mt: 2.5, ml: 1,pr:2 }} >
