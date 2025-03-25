@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Box, Container, Typography, Card, CardContent, Divider, Stack, useMediaQuery,Grid  } from '@mui/material';
 import ShowChartIcon from '@mui/icons-material/TrendingUp';
 import PnlIcon from '@mui/icons-material/AttachMoneyTwoTone';
@@ -14,7 +15,7 @@ import CallReceivedIcon from '@mui/icons-material/CallReceived';
 import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 import ShowChartOutlinedIcon from '@mui/icons-material/ShowChartOutlined';
 import { LineChart } from '@mui/x-charts/LineChart';
-import { dataset } from './basicDataset';
+//import { dataset } from './basicDataset';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -31,8 +32,39 @@ import Select from '@mui/material/Select';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import { BarChart } from '@mui/x-charts/BarChart';
+// Function to format numbers as currency
+const formatCurrency = (value) => `$${value.toFixed(2)}`;
 
-const series = [{ data: [100, -200, 300, 500, -300, -100] }];
+// Function to format date (e.g., "2025-03-24 05:15:34.000" → "Mar 24, 2025 05:15")
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+
+// Transform API data into `rows` format
+const transformApiData = (apiData) => {
+  return apiData.map((position) => {
+    const isBuy = position.type === "BUY";
+    
+    return {
+      type: position.type,
+      lot: position["lot size"],
+      entry: `$${position["Entry Price"].toFixed(2)}`,
+      exit: `$${position["Exit Price"].toFixed(2)}`,
+      profit: `$${position.Profit.toFixed(2)}`,
+      time: formatDate(position["Open Time"]),
+      tcolor: isBuy ? "#22C05C" : "#EF4444",
+      ticon: isBuy ? CallMadeIcon : CallReceivedIcon, // ✅ Valid component
+      pcolor: position.Profit >= 0 ? "#22C05C" : "#EF4444",
+    };
+  });
+};
 
 function createData( type, lot, entry, exit,profit,time,tcolor,ticon,pcolor) {
   return {  type, lot, entry, exit,profit,time,tcolor,ticon,pcolor };
@@ -40,7 +72,47 @@ function createData( type, lot, entry, exit,profit,time,tcolor,ticon,pcolor) {
 function createDataTab2(symbol, total, winrate, netprofit, avgprofit,ncolor,acolor) {
   return {  symbol,total, winrate, netprofit, avgprofit,ncolor,acolor };
 }
+// 1. Extract day name from "Open Time"
+const getDayFromDate = (dateString) => {
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const date = new Date(dateString);
+  return days[date.getDay()];
+};
 
+// 2. Calculate win rate (percentage of profitable trades)
+const calculateWinRate = (trades) => {
+  const profitableTrades = trades.filter(trade => trade.Profit > 0).length;
+  return `${((profitableTrades / trades.length) * 100).toFixed(2)}%`;
+};
+const transformHistoricalData = (apiData) => {
+  // Group trades by day
+  const tradesByDay = apiData.reduce((acc, trade) => {
+    const day = getDayFromDate(trade["Open Time"]);
+    if (!acc[day]) acc[day] = [];
+    acc[day].push(trade);
+    return acc;
+  }, {});
+
+  // Calculate metrics for each day
+  return Object.entries(tradesByDay).map(([day, trades]) => {
+    const netProfit = trades.reduce((sum, trade) => sum + trade.Profit, 0);
+    const avgProfit = netProfit / trades.length;
+    const isNetPositive = netProfit >= 0;
+    const isAvgPositive = avgProfit >= 0;
+
+    return {
+      symbol: day,
+      total: trades.length,
+      winrate: calculateWinRate(trades),
+      netprofit: formatCurrency(netProfit),
+      avgprofit: formatCurrency(avgProfit),
+      ncolor: isNetPositive ? "#22C05C" : "#EF4444",
+      acolor: isAvgPositive ? "#22C05C" : "#EF4444"
+    };
+  });
+};
+
+// 3. Format currency
 const rows = [
   createData('BUY ', 0.1, "$1.08"	,"$1.55", "$12.89","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#22C05C"),
   createData( 'SELL', 1.25, "$1.26	","$1.50", "$39.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C"),
@@ -61,6 +133,151 @@ function Dashboard() {
   const [Symbols, setSymobl] = React.useState('');
   const [colorX, setColorX] = React.useState('piecewise');
   const [colorY, setColorY] = React.useState('None');
+
+  //backend
+  const [tradingData, setTradingData] = useState({
+    Balance: 10000.56,
+    "Margin Level": 2050.15,
+    Equity: 10250.75,
+    "Free Margin": 9750.75,
+    "Total Profit": 500.25,
+    "Win Rate":80.02,
+    "Profit Factor":2.46,
+    "Total Trade":12,
+    "Average Win":1089.77,
+    "Average Loss":-447.90,
+    "Max Drawdown":2047.902,
+    "Sharpe ratio":1.80,
+    "For display graph":[
+      { x: "2025-03-24", y: 2 },
+      { x: "2025-03-23", y: 5.5 },
+      { x: "2025-03-20", y: 2 },
+      { x: "2025-03-19", y: 8.5 },
+      { x: "2025-03-18", y: 1.5 },
+      { x: "2025-03-18", y: 5 },
+    ],
+    "Position Info":[
+      createData('BUY ', 0.1, "$1.08"	,"$1.55", "$12.89","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#22C05C"),
+      createData( 'SELL', 1.25, "$1.26	","$1.50", "$39.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C"),
+      createData( 'BUY ', 0.01, "$150.50","$200.40", "$-50.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444"),
+      createData( 'SELL', 0.15, "$2320.50	","$2430.40", "$500.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C"),
+      createData( 'BUY ', 2.0, "$232	","$250", "$-20.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444"),
+    ],
+     "series" : [{ data: [ -200, 300, 500, -300, -100] }],
+    "day table":[
+      createDataTab2('Monday',42, "61.8%"	,"$105", "$12.89","#22C05C","#22C05C"),
+      createDataTab2('Tuesday', 30, "80.02%","$150", "$39.62","#22C05C","#22C05C"),
+      createDataTab2('Wednesday', 120, "40.33%","$230.40", "$50.62","#22C05C","#22C05C"),
+      createDataTab2('Thursday', 66, "20.45%", "$-430.40", "$-50.62","#EF4444","#EF4444"),
+      createDataTab2('Friday', 30, "73.32%", "$-250", "$-20.62","#EF4444","#EF4444"),
+    ],
+    "sessions": {
+      "Asian": {
+      "Total Trade": 40,
+      "Win Rate": 68.40,
+      "Avg. Profit/Trade": 2.21,
+      "Trades": []
+      },
+      "London": {
+      "Total Trade": 40,
+      "Win Rate": 68.3,
+      "Avg. Profit/Trade": 0,
+      "Trades": []
+      },
+      "New York": {
+      "Total Trade": 40,
+      "Win Rate": 30.34,
+      "Avg. Profit/Trade": -9.18,
+      "Trades": []
+      }
+      }
+
+
+
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchTradingData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get('https://mt4api.frequencee.io/cgi-bin/MT4AccountData.py?FrequenceeID=103');
+      
+      // Update state with new data
+      setTradingData({
+        Balance: response.data.Balance || tradingData.Balance,
+        "Margin Level": response.data["Margin Level"] || tradingData["Margin Level"],
+        Equity: response.data.Equity || tradingData.Equity,
+        "Free Margin": response.data["Free Margin"] || tradingData["Free Margin"],
+        "Total Profit": response.data["Total Profit"] || tradingData["Total Profit"],
+        "Win Rate":response.data["Win Rate"] || tradingData["Win Rate"],
+        "Profit Factor":response.data["Profit Factor"] || tradingData["Profit Factor"],
+        "Total Trade":response.data["Total Trade"] || tradingData["Total Trade"],
+        "Average Win":response.data["Average Win"] || tradingData["Average Win"],
+        "Average Loss":response.data["Average Loss"] || tradingData["Average Loss"],
+        "Max Drawdown":response.data["Max Drawdown"] || tradingData["Max Drawdown"],
+        "Sharpe ratio":response.data["Sharpe ratio"] || tradingData["Sharpe ratio"],
+        
+        "For display graph":response.data["For display graph"].x.map((date, index) => ({
+          x: date,          // Keep as string or convert to Date object if needed
+          y: response.data["For display graph"].y[index]
+        })) || tradingData["For display graph"]
+        ,
+        "Position Info": transformApiData(response.data["Position Info"])||
+        [
+          createData('BUY ', 0.1, "$1.08"	,"$1.55", "$12.89","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#22C05C"),
+          createData( 'SELL', 1.25, "$1.26	","$1.50", "$39.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C"),
+          createData( 'BUY ', 0.01, "$150.50","$200.40", "$-50.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444"),
+          createData( 'SELL', 0.15, "$2320.50	","$2430.40", "$500.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C"),
+          createData( 'BUY ', 2.0, "$232	","$250", "$-20.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444"),
+        ],
+        "series" :[{ data: [ response.data["DoW PL Info"]["Monday"], 
+          response.data["DoW PL Info"]["Tuesday"], 
+          response.data["DoW PL Info"]["Wednesday"], 
+          response.data["DoW PL Info"]["Thursday"],
+          response.data["DoW PL Info"]["Friday"], 
+          
+        ] }]
+        ||[{ data: [ -200, 300, 500, -300, -100] }],
+        "day table":transformHistoricalData(response.data["All Historical Data"]) ||[
+      createDataTab2('Monday',42, "61.8%"	,"$105", "$12.89","#22C05C","#22C05C"),
+      createDataTab2('Tuesday', 30, "80.02%","$150", "$39.62","#22C05C","#22C05C"),
+      createDataTab2('Wednesday', 120, "40.33%","$230.40", "$50.62","#22C05C","#22C05C"),
+      createDataTab2('Thursday', 66, "20.45%", "$-430.40", "$-50.62","#EF4444","#EF4444"),
+      createDataTab2('Friday', 30, "73.32%", "$-250", "$-20.62","#EF4444","#EF4444"),
+    ],
+        'sessions': response.data['Session Stats'] || tradingData['sessions']
+
+
+    
+        
+    
+      });
+
+      
+      setError(null);
+     // console.log(transformApiData(response.data["Position Info"]));
+    } catch (err) {
+      console.error('Error fetching trading data:', err);
+      setError('Failed to fetch trading data');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // Fetch data immediately on component mount
+    fetchTradingData();
+
+    // Set up periodic polling (every 5 seconds)
+    const intervalId = setInterval(fetchTradingData, 5000);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(intervalId);
+  }, []); // Empty dependency array means this effect runs once on mount and sets up recurring calls
+
+
+  ////////
 
   const isMobile = useMediaQuery('(max-width: 766px)'); // Detect mobile/tablet screens
   const isLargeScreen = useMediaQuery('(min-width: 1024px)'); // >= 1024px
@@ -126,7 +343,7 @@ function Dashboard() {
               </Typography>
               </Box>
 
-              <Typography variant="h6" sx={{  pr:0 ,fontFamily: 'system-ui'}}>$10,000.56</Typography>
+              <Typography variant="h6" sx={{  pr:0 ,fontFamily: 'system-ui'}}>${tradingData.Balance.toLocaleString()}</Typography>
             </Box>
             <Box>
             <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -145,7 +362,7 @@ function Dashboard() {
             </Box>
 
 
-              <Typography variant="h6" sx={{  pr:0 ,fontFamily: 'system-ui'}}>2050.15%</Typography>
+              <Typography variant="h6" sx={{  pr:0 ,fontFamily: 'system-ui'}}>{tradingData["Margin Level"].toLocaleString()}%</Typography>
             </Box>
           </Stack>
           <Stack direction="row" justifyContent="space-between" sx={{ mt: 2, pr:6 }}>
@@ -164,7 +381,7 @@ function Dashboard() {
              
             </Box>
 
-              <Typography variant="h6" sx={{  pr:0 ,fontFamily: 'system-ui'}}>$10,250.75</Typography>
+              <Typography variant="h6" sx={{  pr:0 ,fontFamily: 'system-ui'}}> ${tradingData.Equity.toLocaleString()}</Typography>
             </Box>
             <Box>
             <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -182,7 +399,7 @@ function Dashboard() {
             </Box>
 
 
-              <Typography variant="h6" sx={{  pr:0 ,fontFamily: 'system-ui'}}>9750.75</Typography>
+              <Typography variant="h6" sx={{  pr:0 ,fontFamily: 'system-ui'}}>{tradingData["Free Margin"].toLocaleString()}</Typography>
             </Box>
           </Stack>
 
@@ -195,7 +412,7 @@ function Dashboard() {
             <Typography variant="body2" color="textSecondary" fontSize={18}>
               P/L
             </Typography>
-            <Typography variant="h6"   fontWeight={700} sx={{color:'#80ee64'}}>$500.25</Typography>
+            <Typography variant="h6"   fontWeight={700} sx={{color: tradingData["Total Profit"] >= 0 ? '#80ee64' : 'red'}}>${tradingData["Total Profit"].toLocaleString()}</Typography>
           </Box>
         </CardContent>
       </Card>
@@ -204,14 +421,14 @@ function Dashboard() {
       </Typography>
       <Grid container spacing={2} sx={{ mt: 1, ml: -1,pr:1 }}>
       {[
-        { title: 'Total Profit', value: '$2047.902', icon: <ShowChartIcon color="#4caf50" /> },
-        { title: 'Win Rate', value: '80.02%', icon: <PortfolioIcon color="#0D49D6" /> },
-        { title: 'Profit Factor', value: '2.46', icon: <BarChartIcon color="#0D49D6" /> },
-        { title: 'Total Trade', value: '12', icon: <FunctionsIcon color="#A7B1C1" /> },
-        { title: 'Average Win', value: '$1089.77', icon: <CallMadeIcon color="#80ee64" />, color: '#80ee64' },
-        { title: 'Average Loss', value: '$-447.90', icon: <CallReceivedIcon color="#EF4444" />, color: '#EF4444' },
-        { title: 'Max Drawdown', value: '$2047.902', icon: <WarningAmberOutlinedIcon color="#4caf50" />, color: '#4caf50' },
-        { title: 'Sharpe Ratio', value: '1.80', icon: <ShowChartOutlinedIcon color="#0D49D6" /> },
+        { title: 'Total Profit', value: '$'+tradingData["Total Profit"].toLocaleString(), icon: <ShowChartIcon color="#4caf50" /> },
+        { title: 'Win Rate', value: tradingData["Win Rate"].toLocaleString()+'%', icon: <PortfolioIcon color="#0D49D6" /> },
+        { title: 'Profit Factor', value: tradingData["Profit Factor"].toLocaleString(), icon: <BarChartIcon color="#0D49D6" /> },
+        { title: 'Total Trade', value: tradingData["Total Trade"].toLocaleString(), icon: <FunctionsIcon color="#A7B1C1" /> },
+        { title: 'Average Win', value: '$'+tradingData["Average Win"].toLocaleString(), icon: <CallMadeIcon color="#80ee64" />, color: '#80ee64' },
+        { title: 'Average Loss', value: '$'+tradingData["Average Loss"].toLocaleString(), icon: <CallReceivedIcon color="#EF4444" />, color: '#EF4444' },
+        { title: 'Max Drawdown', value: '$'+tradingData["Max Drawdown"].toLocaleString(), icon: <WarningAmberOutlinedIcon color="#4caf50" />, color: '#4caf50' },
+        { title: 'Sharpe Ratio', value: tradingData["Sharpe ratio"].toLocaleString(), icon: <ShowChartOutlinedIcon color="#0D49D6" /> },
       ].map((card, index) => (
         <Grid item xs={12 / cardsPerRow} key={index}>
           <Card
@@ -267,8 +484,8 @@ function Dashboard() {
             
           </Box>
           <LineChart
-      dataset={dataset}
-      xAxis={[{ dataKey: 'x' }]}
+      dataset={tradingData['For display graph']}
+      xAxis={[{ dataKey: 'x' ,scaleType: 'band'}]}
       series={[{ dataKey: 'y',color: '#80ee64'  }]}
       height={300}
       margin={{ left: 30, right: 30, top: 30, bottom: 30 }}
@@ -365,13 +582,13 @@ function Dashboard() {
         </TableCell>
         <TableCell align="right">
         <Typography fontWeight={500} fontFamily={'system-ui'} sx={{ color: '#6B717D' }}>
-        Profit/Loss	Close Time
+        Profit/Loss	Open Time
           </Typography>
         </TableCell>
       </TableRow>
     </TableHead>
     <TableBody>
-      {rows.map((row) => (
+      {tradingData['Position Info'].map((row) => (
         <TableRow key={row.symbol}>
           <TableCell align="right">
   <Box display="flex" justifyContent="flex-end" alignItems="center">
@@ -449,7 +666,7 @@ function Dashboard() {
             <BarChart
               height={300}
               grid={{ horizontal: true }}
-              series={series}
+              series={tradingData['series']}
               margin={{
                 top: 10,
                 bottom: 20,
@@ -511,7 +728,7 @@ function Dashboard() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {tab2rows.map((row) => (
+                  {tradingData['day table'].map((row) => (
                     <TableRow key={row.symbol}>
                       <TableCell align="right">
                         <Typography variant="body1" sx={{ color: '#EBEBEB' }}>
@@ -633,7 +850,7 @@ function Dashboard() {
                   variant="body2"
                   sx={{ color: '#FFFFFF', fontSize: 18, fontFamily: 'system-ui', margin: 0 }}
                 >
-                  40
+                  {tradingData['sessions']['Asian']['Total Trade']}
                 </Typography>
               </Box>
 
@@ -648,7 +865,7 @@ function Dashboard() {
                   variant="body2"
                   sx={{ color: '#FFFFFF', fontSize: 18, fontFamily: 'system-ui', margin: 0 }}
                 >
-                  68.4%
+                  {tradingData['sessions']['Asian']['Win Rate']}%
                 </Typography>
               </Box>
 
@@ -661,9 +878,9 @@ function Dashboard() {
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{ color: '#22C05C', fontSize: 18, fontFamily: 'system-ui', margin: 0 }}
+                  sx={{ color: tradingData['sessions']['Asian']['Avg. Profit/Trade'] >= 0 ? '#22C05C' : '#EF4444', fontSize: 18, fontFamily: 'system-ui', margin: 0 }}
                 >
-                  $2.21
+                  ${tradingData['sessions']['Asian']['Avg. Profit/Trade']}
                 </Typography>
               </Box>
             </CardContent>
@@ -718,7 +935,7 @@ function Dashboard() {
                   variant="body2"
                   sx={{ color: '#FFFFFF', fontSize: 18, fontFamily: 'system-ui', margin: 0 }}
                 >
-                  40
+                  {tradingData['sessions']['London']['Total Trade']}
                 </Typography>
               </Box>
 
@@ -733,7 +950,7 @@ function Dashboard() {
                   variant="body2"
                   sx={{ color: '#FFFFFF', fontSize: 18, fontFamily: 'system-ui', margin: 0 }}
                 >
-                  68.4%
+                  {tradingData['sessions']['London']['Win Rate']}%
                 </Typography>
               </Box>
 
@@ -746,9 +963,9 @@ function Dashboard() {
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{ color: '#22C05C', fontSize: 18, fontFamily: 'system-ui', margin: 0 }}
+                  sx={{ color: tradingData['sessions']['London']['Avg. Profit/Trade'] >= 0 ? '#22C05C' : '#EF4444', fontSize: 18, fontFamily: 'system-ui', margin: 0 }}
                 >
-                  $2.21
+                  ${tradingData['sessions']['London']['Avg. Profit/Trade']}
                 </Typography>
               </Box>
             </CardContent>
@@ -803,7 +1020,7 @@ function Dashboard() {
                   variant="body2"
                   sx={{ color: '#FFFFFF', fontSize: 18, fontFamily: 'system-ui', margin: 0 }}
                 >
-                  40
+                  {tradingData['sessions']['New York']['Total Trade']}
                 </Typography>
               </Box>
 
@@ -818,7 +1035,7 @@ function Dashboard() {
                   variant="body2"
                   sx={{ color: '#FFFFFF', fontSize: 18, fontFamily: 'system-ui', margin: 0 }}
                 >
-                  68.4%
+                  {tradingData['sessions']['New York']['Win Rate']}%
                 </Typography>
               </Box>
 
@@ -831,9 +1048,9 @@ function Dashboard() {
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{ color: '#EF4444', fontSize: 18, fontFamily: 'system-ui', margin: 0 }}
+                  sx={{  color: tradingData['sessions']['New York']['Avg. Profit/Trade'] >= 0 ? '#22C05C' : '#EF4444', fontSize: 18, fontFamily: 'system-ui', margin: 0 }}
                 >
-                  $-9.06
+                  ${tradingData['sessions']['New York']['Avg. Profit/Trade']}
                 </Typography>
               </Box>
             </CardContent>

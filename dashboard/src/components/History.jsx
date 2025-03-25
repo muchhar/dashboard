@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
 import { Box, Container, Typography, Card, CardContent, Divider, Stack ,Button,useMediaQuery} from '@mui/material';
 import ShowChartIcon from '@mui/icons-material/TrendingUp';
 import PnlIcon from '@mui/icons-material/AttachMoneyTwoTone';
@@ -33,51 +35,49 @@ import ScheduleIcon from '@mui/icons-material/Schedule';
 import { BarChart } from '@mui/x-charts/BarChart';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 const series = [{ data: [100, -200, 300, 500, -300, -100] }];
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
 
-function createData(symbol, type, lot, entry, exit,profit,time,tcolor,ticon,pcolor,ctime) {
-  return { symbol, type, lot, entry, exit,profit,time,tcolor,ticon,pcolor,ctime };
+const transformApiData = (apiData) => {
+  return apiData.map((position) => {
+    const isBuy = position.Type === "BUY";
+    
+    return {
+      type: position.Type,
+      lot: position["Lot Size"],
+      entry: `$${position["Entry Price"].toFixed(2)}`,
+      exit: `$${position["Exit Price"].toFixed(2)}`,
+      profit: `$${position.Profit.toFixed(2)}`,
+      time: formatDate(position["Open Time"]),
+      tcolor: isBuy ? "#22C05C" : "#EF4444",
+      ticon: isBuy ? CallMadeIcon : CallReceivedIcon, // ✅ Valid component
+      pcolor: position.Profit >= 0 ? "#22C05C" : "#EF4444",
+      ctime: formatDate(position['Close Time'])
+    };
+  });
+};
+
+function createData( type, lot, entry, exit,profit,time,tcolor,ticon,pcolor,ctime) {
+  return {  type, lot, entry, exit,profit,time,tcolor,ticon,pcolor,ctime };
 }
 function createDataTab2(symbol, total, winrate, netprofit, avgprofit,ncolor,acolor) {
   return { symbol, total, winrate, netprofit, avgprofit,ncolor,acolor };
 }
 
 const rows = [
-  createData('EURUSD','BUY ', 0.1, "$1.08"	,"$1.55", "$12.89","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#22C05C","Mar 17, 2025 22:16"),
-  createData('GBPUSD', 'SELL', 1.25, "$1.26	","$1.50", "$39.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C","Mar 17, 2025 22:16"),
-  createData('XAUUSD', 'BUY ', 0.01, "$150.50","$200.40", "$-50.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444","Mar 17, 2025 22:16"),
-  createData('EURUSD', 'SELL', 0.15, "$2320.50	","$2430.40", "$500.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C","Mar 17, 2025 22:16"),
-  createData('EURUSD', 'BUY ', 2.0, "$232	","$250", "$-20.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444","Mar 17, 2025 22:16"),
-  createData('EURUSD','BUY ', 0.1, "$1.08"	,"$1.55", "$12.89","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#22C05C","Mar 17, 2025 22:16"),
-  createData('GBPUSD', 'SELL', 1.25, "$1.26	","$1.50", "$39.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C","Mar 17, 2025 22:16"),
-  createData('XAUUSD', 'BUY ', 0.01, "$150.50","$200.40", "$-50.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444","Mar 17, 2025 22:16"),
-  createData('EURUSD', 'SELL', 0.15, "$2320.50	","$2430.40", "$500.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C","Mar 17, 2025 22:16"),
-  createData('EURUSD', 'BUY ', 2.0, "$232	","$250", "$-20.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444","Mar 17, 2025 22:16"),
-  createData('EURUSD','BUY ', 0.1, "$1.08"	,"$1.55", "$12.89","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#22C05C","Mar 17, 2025 22:16"),
-  createData('GBPUSD', 'SELL', 1.25, "$1.26	","$1.50", "$39.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C","Mar 17, 2025 22:16"),
-  createData('XAUUSD', 'BUY ', 0.01, "$150.50","$200.40", "$-50.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444","Mar 17, 2025 22:16"),
-  createData('EURUSD', 'SELL', 0.15, "$2320.50	","$2430.40", "$500.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C","Mar 17, 2025 22:16"),
-  createData('EURUSD', 'BUY ', 2.0, "$232	","$250", "$-20.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444","Mar 17, 2025 22:16"),
-  createData('EURUSD','BUY ', 0.1, "$1.08"	,"$1.55", "$12.89","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#22C05C","Mar 17, 2025 22:16"),
-  createData('GBPUSD', 'SELL', 1.25, "$1.26	","$1.50", "$39.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C","Mar 17, 2025 22:16"),
-  createData('XAUUSD', 'BUY ', 0.01, "$150.50","$200.40", "$-50.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444","Mar 17, 2025 22:16"),
-  createData('EURUSD', 'SELL', 0.15, "$2320.50	","$2430.40", "$500.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C","Mar 17, 2025 22:16"),
-  createData('EURUSD', 'BUY ', 2.0, "$232	","$250", "$-20.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444","Mar 17, 2025 22:16"),
-  createData('EURUSD','BUY ', 0.1, "$1.08"	,"$1.55", "$12.89","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#22C05C","Mar 17, 2025 22:16"),
-  createData('GBPUSD', 'SELL', 1.25, "$1.26	","$1.50", "$39.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C","Mar 17, 2025 22:16"),
-  createData('XAUUSD', 'BUY ', 0.01, "$150.50","$200.40", "$-50.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444","Mar 17, 2025 22:16"),
-  createData('EURUSD', 'SELL', 0.15, "$2320.50	","$2430.40", "$500.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C","Mar 17, 2025 22:16"),
-  createData('EURUSD', 'BUY ', 2.0, "$232	","$250", "$-20.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444","Mar 17, 2025 22:16"),
-  createData('EURUSD','BUY ', 0.1, "$1.08"	,"$1.55", "$12.89","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#22C05C","Mar 17, 2025 22:16"),
-  createData('GBPUSD', 'SELL', 1.25, "$1.26	","$1.50", "$39.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C","Mar 17, 2025 22:16"),
-  createData('XAUUSD', 'BUY ', 0.01, "$150.50","$200.40", "$-50.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444","Mar 17, 2025 22:16"),
-  createData('EURUSD', 'SELL', 0.15, "$2320.50	","$2430.40", "$500.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C","Mar 17, 2025 22:16"),
-  createData('EURUSD', 'BUY ', 2.0, "$232	","$250", "$-20.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444","Mar 17, 2025 22:16"),
-  createData('EURUSD','BUY ', 0.1, "$1.08"	,"$1.55", "$12.89","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#22C05C","Mar 17, 2025 22:16"),
-  createData('GBPUSD', 'SELL', 1.25, "$1.26	","$1.50", "$39.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C","Mar 17, 2025 22:16"),
-  createData('XAUUSD', 'BUY ', 0.01, "$150.50","$200.40", "$-50.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444","Mar 17, 2025 22:16"),
-  createData('EURUSD', 'SELL', 0.15, "$2320.50	","$2430.40", "$500.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C","Mar 17, 2025 22:16"),
-  createData('EURUSD', 'BUY ', 2.0, "$232	","$250", "$-20.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444","Mar 17, 2025 22:16"),
-
+  createData('BUY ', 0.1, "$1.08"	,"$1.55", "$12.89","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#22C05C","Mar 17, 2025 22:16"),
+  createData('SELL', 1.25, "$1.26	","$1.50", "$39.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C","Mar 17, 2025 22:16"),
+  createData('BUY ', 0.01, "$150.50","$200.40", "$-50.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444","Mar 17, 2025 22:16"),
+  createData('SELL', 0.15, "$2320.50	","$2430.40", "$500.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C","Mar 17, 2025 22:16"),
+  
 ];
 const tab2rows = [
   createDataTab2('EURUSD',42, "61.8%"	,"$105", "$12.89","#22C05C","#22C05C"),
@@ -94,8 +94,135 @@ function History() {
   
   const [colorX, setColorX] = React.useState('piecewise');
   const [colorY, setColorY] = React.useState('None');
-  const isWideScreen = useMediaQuery('(min-width: 766px)'); // Check if screen width is >= 766px
   
+  const isWideScreen = useMediaQuery('(min-width: 766px)'); // Check if screen width is >= 766px
+   //backend
+   const [tradingData, setTradingData] = useState({
+    Balance: 10000.56,
+    "Margin Level": 2050.15,
+    Equity: 10250.75,
+    "Free Margin": 9750.75,
+    "Total Profit": 500.25,
+    "Win Rate":80.02,
+    "Profit Factor":2.46,
+    "Total Trade":12,
+    "Average Win":1089.77,
+    "Average Loss":-447.90,
+    "Max Drawdown":2047.902,
+    "Sharpe ratio":1.80,
+    "All Historical Data":[
+      createData('BUY ', 0.1, "$1.08"	,"$1.55", "$12.89","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#22C05C","Mar 17, 2025 22:16"),
+      createData( 'SELL', 1.25, "$1.26	","$1.50", "$39.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C","Mar 17, 2025 22:16"),
+      createData( 'BUY ', 0.01, "$150.50","$200.40", "$-50.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444","Mar 17, 2025 22:16"),
+      createData( 'SELL', 0.15, "$2320.50	","$2430.40", "$500.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C","Mar 17, 2025 22:16"),
+      createData( 'BUY ', 2.0, "$232	","$250", "$-20.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444","Mar 17, 2025 22:16"),
+    ],
+   
+
+
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchTradingData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get('https://mt4api.frequencee.io/cgi-bin/MT4AccountData.py?FrequenceeID=103');
+      
+      // Update state with new data
+      setTradingData({
+        Balance: response.data.Balance || tradingData.Balance,
+        "Margin Level": response.data["Margin Level"] || tradingData["Margin Level"],
+        Equity: response.data.Equity || tradingData.Equity,
+        "Free Margin": response.data["Free Margin"] || tradingData["Free Margin"],
+        "Total Profit": response.data["Total Profit"] || tradingData["Total Profit"],
+        "Win Rate":response.data["Win Rate"] || tradingData["Win Rate"],
+        "Profit Factor":response.data["Profit Factor"] || tradingData["Profit Factor"],
+        "Total Trade":response.data["Total Trade"] || tradingData["Total Trade"],
+        "Average Win":response.data["Average Win"] || tradingData["Average Win"],
+        "Average Loss":response.data["Average Loss"] || tradingData["Average Loss"],
+        "Max Drawdown":response.data["Max Drawdown"] || tradingData["Max Drawdown"],
+        "Sharpe ratio":response.data["Sharpe ratio"] || tradingData["Sharpe ratio"],
+        
+        "All Historical Data": transformApiData(response.data["All Historical Data"])||
+        [
+          createData('BUY ', 0.1, "$1.08"	,"$1.55", "$12.89","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#22C05C"),
+          createData( 'SELL', 1.25, "$1.26	","$1.50", "$39.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C"),
+          createData( 'BUY ', 0.01, "$150.50","$200.40", "$-50.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444"),
+          createData( 'SELL', 0.15, "$2320.50	","$2430.40", "$500.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C"),
+          createData( 'BUY ', 2.0, "$232	","$250", "$-20.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444"),
+        ],
+       
+
+    
+        
+    
+      });
+
+      
+      setError(null);
+     // console.log(transformApiData(response.data["Position Info"]));
+    } catch (err) {
+      console.error('Error fetching trading data:', err);
+      setError('Failed to fetch trading data');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const exportToCSV = () => {
+    // Prepare CSV headers
+    const headers = [
+      'Type',
+      'Lot Size',
+      'Entry Price',
+      'Exit Price',
+      'Profit',
+      'Open Time',
+      'Close Time'
+      
+    ].join(',');
+
+    // Prepare CSV rows
+    const rows = tradingData['All Historical Data'].map(item => [
+      `"${item.type}"`,
+      item.lot,
+      `"${item.entry}"`,
+      `"${item.exit}"`,
+      `"${item.profit}"`,
+      `"${item.time}"`,
+      `"${item.ctime}"`,
+      
+    ].join(','));
+
+    // Combine headers and rows
+    const csvContent = [headers, ...rows].join('\n');
+
+    // Create download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'trading_data.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  useEffect(() => {
+    // Fetch data immediately on component mount
+    fetchTradingData();
+
+    // Set up periodic polling (every 5 seconds)
+    const intervalId = setInterval(fetchTradingData, 5000);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(intervalId);
+  }, []); // Empty dependency array means this effect runs once on mount and sets up recurring calls
+
+
+  ////////
+
   const handleChange = (event) => {
     setPeriod(event.target.value);
   };
@@ -112,7 +239,7 @@ function History() {
   <Typography variant="h5" fontWeight="bold" sx={{pl:2}} >
     Trade History
   </Typography>
-  <Button variant="outlined" startIcon={<FileDownloadOutlinedIcon />} 
+  <Button variant="outlined" onClick={exportToCSV} startIcon={<FileDownloadOutlinedIcon />} 
   sx={{
     color: "#ffffff",
     borderColor: "#ffffff",
@@ -163,7 +290,7 @@ function History() {
           {/* Value */}
           <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ pt: 1 }}>
             <Typography variant="h5" marginLeft={0} fontWeight="bold" gutterBottom>
-              50
+              {tradingData['Total Trade']}
             </Typography>
           </Box>
         </CardContent>
@@ -192,7 +319,7 @@ function History() {
           {/* Value */}
           <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ pt: 1 }}>
             <Typography variant="h5" marginLeft={0} fontWeight="bold" gutterBottom>
-              50.0%
+              {tradingData['Win Rate']}%
             </Typography>
           </Box>
         </CardContent>
@@ -220,8 +347,8 @@ function History() {
 
           {/* Value */}
           <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ pt: 1 }}>
-            <Typography variant="h5" marginLeft={0} fontWeight="bold" gutterBottom sx={{ color: '#EF4444' }}>
-              $-71.87
+            <Typography variant="h5" marginLeft={0} fontWeight="bold" gutterBottom sx={{ color: tradingData['Total Profit'] >= 0 ? '#22C05C' : '#EF4444' }}>
+              ${tradingData['Total Profit']}
             </Typography>
           </Box>
         </CardContent>
@@ -249,8 +376,8 @@ function History() {
 
           {/* Value */}
           <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ pt: 1 }}>
-            <Typography variant="h5" marginLeft={0} fontWeight="bold" gutterBottom sx={{ color: '#EF4444' }}>
-              $-1.44
+            <Typography variant="h5" marginLeft={0} fontWeight="bold" gutterBottom sx={{ color: tradingData['Average Win'] >= 0 ? '#22C05C' : '#EF4444' }}>
+              ${(tradingData['Average Win']+tradingData['Average Loss'])/tradingData['Total Trade']}
             </Typography>
           </Box>
         </CardContent>
@@ -403,7 +530,7 @@ function History() {
       </TableRow>
     </TableHead>
     <TableBody>
-      {rows.map((row) => (
+      {tradingData['All Historical Data'].map((row) => (
         <TableRow key={row.symbol}>
           <TableCell align="right">
   <Box display="flex" justifyContent="flex-end" alignItems="center">

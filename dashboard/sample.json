@@ -1,0 +1,123 @@
+{
+    "FrequenceeID": 103,
+    "Balance": 50008.14,
+    "Margin Level": 291818.89,
+    "Equity": 50046.94,
+    "Free Margin": 50029.79,
+    "Total Profit": 8.14,
+    "Win Rate": 50.0,
+    "Profit Factor": 46.22,
+    "Total Trade": 2,
+    "Average Win": 8.32,
+    "Average Loss": -0.18,
+    "Max Drawdown": -0.18,
+    "Sharpe ratio": 0.96,
+    "For display graph": {
+        "x": [
+            "2025-03-22",
+            "2025-03-23"
+        ],
+        "y": [
+            -0.18,
+            8.32
+        ]
+    },
+    "Data table": [
+        {
+            "Symbol": "ETHUSD",
+            "Type": "BUY",
+            "Lot Size": 0.05,
+            "Entry Price": 1988.91,
+            "Open Time": "2025-03-22 22:34:14",
+            "Exit Price": 1985.25,
+            "Profit": -0.18,
+            "Close Time": "2025-03-22 22:35:37"
+        },
+        {
+            "Symbol": "BTCUSD",
+            "Type": "BUY",
+            "Lot Size": 0.05,
+            "Entry Price": 84027.72,
+            "Open Time": "2025-03-22 22:34:27",
+            "Exit Price": 84194.03,
+            "Profit": 8.32,
+            "Close Time": "2025-03-23 06:02:53"
+        }
+    ],
+    "Position Info": [
+        {
+            "Symbols": "BTCUSD",
+            "type": "BUY",
+            "lot size": 0.04,
+            "Open Time": "2025-03-24 05:15:34.000",
+            "Entry Price": 85758.05,
+            "Exit Price": 86775.69,
+            "Profit": 38.76
+        }
+    ],
+    "Session Stats": {
+        "Asian": {
+            "Total Trade": 1,
+            "Win Rate": 100.0,
+            "Avg. Profit/Trade": 8.32,
+            "Trades": []
+        },
+        "London": {
+            "Total Trade": 0,
+            "Win Rate": 0,
+            "Avg. Profit/Trade": 0,
+            "Trades": []
+        },
+        "New York": {
+            "Total Trade": 1,
+            "Win Rate": 0.0,
+            "Avg. Profit/Trade": -0.18,
+            "Trades": []
+        }
+    },
+    "All Historical Data": [
+        {
+            "Symbol": "ETHUSD",
+            "Type": "BUY",
+            "Lot Size": 0.05,
+            "Entry Price": 1988.91,
+            "Open Time": "2025-03-22 22:34:14",
+            "Exit Price": 1985.25,
+            "Profit": -0.18,
+            "Close Time": "2025-03-22 22:35:37"
+        },
+        {
+            "Symbol": "BTCUSD",
+            "Type": "BUY",
+            "Lot Size": 0.05,
+            "Entry Price": 84027.72,
+            "Open Time": "2025-03-22 22:34:27",
+            "Exit Price": 84194.03,
+            "Profit": 8.32,
+            "Close Time": "2025-03-23 06:02:53"
+        }
+    ],
+    "DoW PL Info": {
+        "Monday": 0.0,
+        "Tuesday": 0.0,
+        "Wednesday": 0.0,
+        "Thursday": 0.0,
+        "Friday": 0.0,
+        "Saturday": -0.18,
+        "Sunday": 8.32
+    },
+    "DoM PL Info": {
+        "January": 0.0,
+        "February": 0.0,
+        "March": 8.14,
+        "April": 0.0,
+        "May": 0.0,
+        "June": 0.0,
+        "July": 0.0,
+        "August": 0.0,
+        "September": 0.0,
+        "October": 0.0,
+        "November": 0.0,
+        "December": 0.0
+    }
+}
