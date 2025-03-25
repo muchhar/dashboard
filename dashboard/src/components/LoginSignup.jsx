@@ -104,7 +104,7 @@ export default function LoginSignup() {
             />
             Continue with Google
           </button>
-          <button className="w-full flex items-center justify-center gap-2 py-2 bg-[#151818] border border-[#637260] rounded-lg text-[#ddffdc] hover:border-[#80ee64] transition-colors">
+          <button className="w-full flex items-center justify-center gap-2 py-2 bg-[#151818] border border-[#637260] rounded-lg text-[#ddffdc] hover:border-[#80ee64] transition-colors pt-1">
             <img
               src="https://cdn-icons-png.flaticon.com/512/733/733547.png"
               alt="FaceBook"

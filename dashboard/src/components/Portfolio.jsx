@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Box, Container, Typography, Card, CardContent, Divider, Stack ,Button,useMediaQuery,Grid} from '@mui/material';
 import ShowChartIcon from '@mui/icons-material/TrendingUp';
 import PnlIcon from '@mui/icons-material/AttachMoneyTwoTone';
@@ -14,7 +15,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { PieChart } from '@mui/x-charts/PieChart';
 import { dataset2 } from './profit';
-
+import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 
 function createData(symbol, type, lot, entry, exit,profit,time,tcolor,ticon,pcolor,ctime) {
   return { symbol, type, lot, entry, exit,profit,time,tcolor,ticon,pcolor,ctime };
@@ -22,6 +23,20 @@ function createData(symbol, type, lot, entry, exit,profit,time,tcolor,ticon,pcol
 function createDataTab2(symbol, total, winrate, netprofit, avgprofit,ncolor,acolor) {
   return { symbol, total, winrate, netprofit, avgprofit,ncolor,acolor };
 }
+const transformDaysData = (dowData) => {
+  const daysOrder = ['January', 'February', 'March', 'April', 'May', 'June', 'July','August','September','October','November','December'];
+  const shortDays = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul','Aug','Sep','Oct','Nov','Dec'];
+  
+  return daysOrder.map((day, index) => {
+    const value = dowData[day] || 0;
+    return {
+      month: shortDays[index],
+      seoul: value,
+      seoul_positive: value >= 0 ? value : null,
+      seoul_negative: value < 0 ? value : null
+    };
+  });
+};
 const dataset3 = [
   { month: 'Jan', value: 100 },
   { month: 'Feb', value: -30 },
@@ -65,6 +80,162 @@ function Portfolio() {
    const isLargeScreen = useMediaQuery('(min-width: 1024px)'); // >= 1024px
   const isMediumScreen = useMediaQuery('(min-width: 766px) and (max-width: 1023px)'); // 766px - 1023px
   const isSmallScreen = useMediaQuery('(max-width: 765px)'); // <= 765px
+   //backend
+   const [tradingData, setTradingData] = useState({
+    Balance: 10000.56,
+    "Margin Level": 2050.15,
+    Equity: 10250.75,
+    "Free Margin": 9750.75,
+    "Total Profit": 500.25,
+    "Win Rate":80.02,
+    "Profit Factor":2.46,
+    "Total Trade":12,
+    "Average Win":1089.77,
+    "Average Loss":-447.90,
+    "Max Drawdown":2047.902,
+    "Sharpe ratio":1.80,
+    "For display graph":[
+      // { x: "2025-03-24", y: 2 },
+      // { x: "2025-03-23", y: 5.5 },
+      // { x: "2025-03-20", y: 2 },
+      // { x: "2025-03-19", y: 8.5 },
+      // { x: "2025-03-18", y: 1.5 },
+      // { x: "2025-03-18", y: 5 },
+    ],
+     "series" : [{ data: [ -200, 300, 500, -300, -100] }],
+     "Open Position":0,
+     "Month Data":[],
+     "Days Wise": [
+      {
+        label: 'Mon',
+        value: 120,
+         color: '#22C05C'
+      },
+      {
+        label: 'Tue',
+        value: 45,
+         color: '#EF4444'
+      },
+      {
+        label: 'Wed',
+        value: 90,
+         color: '#e8c813'
+      },
+      {
+        label: 'Thu',
+        value: 34,
+         color: '#3f1ee9'
+      },
+      {
+        label: 'Fri',
+        value: 10,
+         color: '#e91e63'
+      }
+  ]
+
+
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchTradingData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get('https://mt4api.frequencee.io/cgi-bin/MT4AccountData.py?FrequenceeID=103');
+      
+      // Update state with new data
+      setTradingData({
+        Balance: response.data.Balance || tradingData.Balance,
+        "Margin Level": response.data["Margin Level"] || tradingData["Margin Level"],
+        Equity: response.data.Equity || tradingData.Equity,
+        "Free Margin": response.data["Free Margin"] || tradingData["Free Margin"],
+        "Total Profit": response.data["Total Profit"] || tradingData["Total Profit"],
+        "Win Rate":response.data["Win Rate"] || tradingData["Win Rate"],
+        "Profit Factor":response.data["Profit Factor"] || tradingData["Profit Factor"],
+        "Total Trade":response.data["Total Trade"] || tradingData["Total Trade"],
+        "Average Win":response.data["Average Win"] || tradingData["Average Win"],
+        "Average Loss":response.data["Average Loss"] || tradingData["Average Loss"],
+        "Max Drawdown":response.data["Max Drawdown"] || tradingData["Max Drawdown"],
+        "Sharpe ratio":response.data["Sharpe ratio"] || tradingData["Sharpe ratio"],
+        
+        "For display graph": response.data["For display graph"].x.map((date, index) => ({
+          x: date,          // Keep as string or convert to Date object if needed
+          y: response.data["For display graph"].y[index]
+        })) || tradingData["For display graph"]
+        ,
+        "series" :[{ data: [ response.data["DoW PL Info"]["Monday"], 
+          response.data["DoW PL Info"]["Tuesday"], 
+          response.data["DoW PL Info"]["Wednesday"], 
+          response.data["DoW PL Info"]["Thursday"],
+          response.data["DoW PL Info"]["Friday"], 
+          
+        ] }]
+        ||[{ data: [ -200, 300, 500, -300, -100] }],
+        "Open Position": response.data["Position Info"].length,
+        "Days Wise": [
+          {
+            label: 'Mon',
+            value: response.data["DoW PL Info"]["Monday"],
+             color: '#22C05C'
+          },
+          {
+            label: 'Tue',
+            value: response.data["DoW PL Info"]["Tuesday"],
+             color: '#EF4444'
+          },
+          {
+            label: 'Wed',
+            value: response.data["DoW PL Info"]["Wednesday"], 
+                
+             color: '#e8c813'
+          },
+          {
+            label: 'Thu',
+            value: response.data["DoW PL Info"]["Thursday"],
+                
+             color: '#3f1ee9'
+          },
+          {
+            label: 'Fri',
+            value: response.data["DoW PL Info"]["Friday"], 
+                
+             color: '#e91e63'
+          }
+      ],
+       "Month Data":transformDaysData(response.data["DoM PL Info"]) || tradingData["Month Data"],
+       
+       
+
+    
+        
+    
+      });
+
+      
+      setError(null);
+     // console.log(transformApiData(response.data["Position Info"]));
+    } catch (err) {
+      console.error('Error fetching trading data:', err);
+      setError('Failed to fetch trading data');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // Fetch data immediately on component mount
+    fetchTradingData();
+
+    // Set up periodic polling (every 5 seconds)
+    const intervalId = setInterval(fetchTradingData, 5000);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(intervalId);
+  }, []); // Empty dependency array means this effect runs once on mount and sets up recurring calls
+
+
+  ////////
+
   const handleChange = (event) => {
     setPeriod(event.target.value);
   };
@@ -92,33 +263,7 @@ function Portfolio() {
     ...negativeData2[index]
   }));
   
-  const desktopOS = [
-    {
-      label: 'Mon',
-      value: 120,
-       color: '#22C05C'
-    },
-    {
-      label: 'Tue',
-      value: 45,
-       color: '#EF4444'
-    },
-    {
-      label: 'Wed',
-      value: 90,
-       color: '#e8c813'
-    },
-    {
-      label: 'Thu',
-      value: 34,
-       color: '#3f1ee9'
-    },
-    {
-      label: 'Fri',
-      value: 10,
-       color: '#e91e63'
-    }
-];
+  //const desktopOS = ;
   
   const handleChange2 = (event) => {
     setSymobl(event.target.value);
@@ -193,12 +338,16 @@ function Portfolio() {
       </Typography>
       <Stack direction="row" display={'flex'} spacing={2}>
       <Typography variant="h6" fontWeight={700} sx={{ fontFamily: 'system-ui',fontSize:'24px' }}>
-      $26,321.3
+      ${tradingData["Balance"]}
       </Typography>
       <Box display={'flex'} sx={{pt:1.5}}>
-      <ShowChartIcon sx={{color:'#22C05C',fontSize:24,pl:0.5}}/>
-      <Typography variant="body2" sx={{ fontFamily: 'system-ui',color:'#22C05C' }}>
-      +368.51 (+1.40%)
+      {tradingData["Total Profit"] >= 0 ? (
+  <ShowChartIcon sx={{ color: '#22C05C', fontSize: 24, pl: 0.5 }} />
+) : (
+  <TrendingDownIcon sx={{ color: '#EF4444', fontSize: 24, pl: 0.5 }} />
+)}
+      <Typography variant="body2" sx={{ fontFamily: 'system-ui',color: tradingData["Total Profit"]>=0?'#22C05C':'#EF4444' }}>
+      {tradingData["Total Profit"]} ({((tradingData["Total Profit"]/tradingData["Balance"])*100).toFixed(2)}%)
       </Typography>
       </Box>
       </Stack>
@@ -285,9 +434,9 @@ function Portfolio() {
           <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ pl: 0.5, pt: 1 }}>
             <Typography
               variant="body2"
-              sx={{ color: '#22C05C', fontSize: 24, fontFamily: 'system-ui', margin: 0, pt: 0, fontWeight: 700 }}
+              sx={{ color:tradingData["Total Profit"]>=0? '#22C05C':'#EF4444', fontSize: 24, fontFamily: 'system-ui', margin: 0, pt: 0, fontWeight: 700 }}
             >
-              +$3,245.75
+              ${tradingData["Total Profit"]}
             </Typography>
           </Box>
         </CardContent>
@@ -329,7 +478,7 @@ function Portfolio() {
               variant="body2"
               sx={{ color: '#FFFFFF', fontSize: 24, fontFamily: 'system-ui', margin: 0, pt: 0, fontWeight: 700 }}
             >
-              12.8%
+              {((tradingData["Total Profit"]/tradingData["Balance"])*100).toFixed(2)}%
             </Typography>
           </Box>
         </CardContent>
@@ -371,7 +520,7 @@ function Portfolio() {
               variant="body2"
               sx={{ color: '#FFFFFF', fontSize: 24, fontFamily: 'system-ui', margin: 0, pt: 0, fontWeight: 700 }}
             >
-              8
+              {tradingData["Open Position"]}
             </Typography>
           </Box>
         </CardContent>
@@ -440,7 +589,7 @@ function Portfolio() {
         sx={{marginLeft:-10}}
         series={[
           {
-            data: desktopOS.slice(0, 5),
+            data: tradingData["Days Wise"].slice(0, 5),
             innerRadius:50,
             
           },
@@ -463,18 +612,18 @@ function Portfolio() {
          
        </Box>
        <BarChart
-        dataset={combinedData2 }
+        dataset={tradingData["Month Data"] }
         xAxis={[{ scaleType: 'band', dataKey: 'month' }]}
         series={[
           { 
-            dataKey: 'value_positive', 
-           // valueFormatter,
+            dataKey: 'seoul_positive', 
             color: '#4CAF50', // Green for positive
+            //label: 'Profit'
           },
           { 
-            dataKey: 'value_negative', 
-           // valueFormatter,
+            dataKey: 'seoul_negative', 
             color: '#F44336', // Red for negative
+            //label: 'Loss'
           }
         ]} 
         {...chartSetting}
@@ -535,7 +684,7 @@ function Portfolio() {
                 variant="body2"
                 sx={{ color: '#FFFFFF', fontSize: 20, fontFamily: 'system-ui', margin: 0, pt: 0, fontWeight: 700 }}
               >
-                0.70
+                {tradingData["Sharpe ratio"]}
               </Typography>
             </Box>
             <Typography
@@ -583,7 +732,7 @@ function Portfolio() {
                 variant="body2"
                 sx={{ color: '#EF4444', fontSize: 24, fontFamily: 'system-ui', margin: 0, pt: 0, fontWeight: 700 }}
               >
-                -16.06%
+                {tradingData["Max Drawdown"]}%
               </Typography>
             </Box>
             <Typography
@@ -679,7 +828,7 @@ function Portfolio() {
                 variant="body2"
                 sx={{ color: '#22C05C', fontSize: 20, fontFamily: 'system-ui', margin: 0, pt: 0, fontWeight: 700 }}
               >
-                67.60%
+                {tradingData["Win Rate"]}%
               </Typography>
             </Box>
             <Typography
@@ -727,7 +876,7 @@ function Portfolio() {
                 variant="body2"
                 sx={{ color: '#FFFFFF', fontSize: 20, fontFamily: 'system-ui', margin: 0, pt: 0, fontWeight: 700 }}
               >
-                2.04
+                {tradingData["Profit Factor"]}
               </Typography>
             </Box>
             <Typography
@@ -773,10 +922,10 @@ function Portfolio() {
             <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ pl: 0.5, pt: 1 }}>
               <Typography
                 variant="body2"
-                sx={{ color: '#22C05C', fontSize: 20, fontFamily: 'system-ui', margin: 0, pt: 0, fontWeight: 700 }}
+                sx={{ color: tradingData['Average Win'] >= 0 ? '#22C05C' : '#EF4444', fontSize: 20, fontFamily: 'system-ui', margin: 0, pt: 0, fontWeight: 700 }}
               >
-                $16.37
-              </Typography>
+               ${((tradingData['Average Win']+tradingData['Average Loss'])/tradingData['Total Trade']).toFixed(2)}
+               </Typography>
             </Box>
             <Typography
               variant="body2"

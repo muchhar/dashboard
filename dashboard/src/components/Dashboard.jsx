@@ -127,6 +127,22 @@ const tab2rows = [
   createDataTab2('Thursday', 66, "20.45%", "$-430.40", "$-50.62","#EF4444","#EF4444"),
   createDataTab2('Friday', 30, "73.32%", "$-250", "$-20.62","#EF4444","#EF4444"),
 ];
+function transformGraphData(apiData) {
+  return {
+    "For display graph": apiData.x.map((dateStr, index) => {
+      const date = new Date(dateStr);
+      const formattedDate = date.toLocaleDateString('en-US', {
+        day: 'numeric',
+        month: 'short'
+      });
+      
+      return {
+        x: formattedDate.replace(',', ''), // "24 Mar" instead of "24 Mar,"
+        y: apiData.y[index]
+      };
+    })
+  };
+}
 
 function Dashboard() {
   const [Period, setPeriod] = React.useState('');
@@ -149,12 +165,12 @@ function Dashboard() {
     "Max Drawdown":2047.902,
     "Sharpe ratio":1.80,
     "For display graph":[
-      { x: "2025-03-24", y: 2 },
-      { x: "2025-03-23", y: 5.5 },
-      { x: "2025-03-20", y: 2 },
-      { x: "2025-03-19", y: 8.5 },
-      { x: "2025-03-18", y: 1.5 },
-      { x: "2025-03-18", y: 5 },
+      // { x: "2025-03-24", y: 2 },
+      // { x: "2025-03-23", y: 5.5 },
+      // { x: "2025-03-20", y: 2 },
+      // { x: "2025-03-19", y: 8.5 },
+      // { x: "2025-03-18", y: 1.5 },
+      // { x: "2025-03-18", y: 5 },
     ],
     "Position Info":[
       createData('BUY ', 0.1, "$1.08"	,"$1.55", "$12.89","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#22C05C"),
@@ -174,18 +190,21 @@ function Dashboard() {
     "sessions": {
       "Asian": {
       "Total Trade": 40,
+      "Total Profit": 80.32,
       "Win Rate": 68.40,
       "Avg. Profit/Trade": 2.21,
       "Trades": []
       },
       "London": {
       "Total Trade": 40,
+      "Total Profit": 832,
       "Win Rate": 68.3,
       "Avg. Profit/Trade": 0,
       "Trades": []
       },
       "New York": {
       "Total Trade": 40,
+      "Total Profit": -18.32,
       "Win Rate": 30.34,
       "Avg. Profit/Trade": -9.18,
       "Trades": []
@@ -218,7 +237,7 @@ function Dashboard() {
         "Max Drawdown":response.data["Max Drawdown"] || tradingData["Max Drawdown"],
         "Sharpe ratio":response.data["Sharpe ratio"] || tradingData["Sharpe ratio"],
         
-        "For display graph":response.data["For display graph"].x.map((date, index) => ({
+        "For display graph": response.data["For display graph"].x.map((date, index) => ({
           x: date,          // Keep as string or convert to Date object if needed
           y: response.data["For display graph"].y[index]
         })) || tradingData["For display graph"]
@@ -833,10 +852,11 @@ function Dashboard() {
                 </Box>
                 <Typography
                   variant="body2"
-                  sx={{ color: '#22C05C', fontSize: 18, fontFamily: 'system-ui', margin: 0 }}
+                  sx={{ color: tradingData["sessions"]["Asian"]["Total Profit"]>=0?'#22C05C':'#EF4444', fontSize: 18, fontFamily: 'system-ui', margin: 0 }}
                 >
-                  $88.20
+                  ${tradingData["sessions"]["Asian"]["Total Profit"]}
                 </Typography>
+              
               </Box>
 
               <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ pt: 1 }}>
@@ -918,10 +938,11 @@ function Dashboard() {
                 </Box>
                 <Typography
                   variant="body2"
-                  sx={{ color: '#22C05C', fontSize: 18, fontFamily: 'system-ui', margin: 0 }}
+                  sx={{ color: tradingData["sessions"]["London"]["Total Profit"]>=0?'#22C05C':'#EF4444', fontSize: 18, fontFamily: 'system-ui', margin: 0 }}
                 >
-                  $172.20
+                  ${tradingData["sessions"]["London"]["Total Profit"]}
                 </Typography>
+              
               </Box>
 
               <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ pt: 1 }}>
@@ -1003,9 +1024,9 @@ function Dashboard() {
                 </Box>
                 <Typography
                   variant="body2"
-                  sx={{ color: '#EF4444', fontSize: 18, fontFamily: 'system-ui', margin: 0 }}
+                  sx={{ color: tradingData["sessions"]["New York"]["Total Profit"]>=0?'#22C05C':'#EF4444', fontSize: 18, fontFamily: 'system-ui', margin: 0 }}
                 >
-                  $-253.55
+                  ${tradingData["sessions"]["New York"]["Total Profit"]}
                 </Typography>
               </Box>
 
