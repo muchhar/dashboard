@@ -6,7 +6,7 @@ import PnlIcon from '@mui/icons-material/AttachMoneyTwoTone';
 import PercentIcon from '@mui/icons-material/Percent';
 import SignalCellularAltIcon from '@mui/icons-material/SignalCellularAlt';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
-
+import Skeleton from '@mui/material/Skeleton';
 import PortfolioIcon from '@mui/icons-material/PieChart';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import FunctionsIcon from '@mui/icons-material/Functions';
@@ -34,7 +34,8 @@ import ScheduleIcon from '@mui/icons-material/Schedule';
 import { BarChart } from '@mui/x-charts/BarChart';
 // Function to format numbers as currency
 const formatCurrency = (value) => `$${value.toFixed(2)}`;
-
+var x_load=true;
+  
 // Function to format date (e.g., "2025-03-24 05:15:34.000" → "Mar 24, 2025 05:15")
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -165,13 +166,7 @@ function Dashboard() {
     "Max Drawdown":2047.902,
     "Sharpe ratio":1.80,
     "For display graph":[
-      // { x: "2025-03-24", y: 2 },
-      // { x: "2025-03-23", y: 5.5 },
-      // { x: "2025-03-20", y: 2 },
-      // { x: "2025-03-19", y: 8.5 },
-      // { x: "2025-03-18", y: 1.5 },
-      // { x: "2025-03-18", y: 5 },
-    ],
+     ],
     "Position Info":[
       createData('BUY ', 0.1, "$1.08"	,"$1.55", "$12.89","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#22C05C"),
       createData( 'SELL', 1.25, "$1.26	","$1.50", "$39.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C"),
@@ -317,6 +312,30 @@ function Dashboard() {
   const handleChange2 = (event) => {
     setSymobl(event.target.value);
   };
+  if(tradingData["For display graph"].length==0){
+    return(
+      <Box
+      sx={{
+        bgcolor: '#121212',
+        p: 8,
+        width: '100%',
+        display: 'flex',
+        height:700,
+        justifyContent: 'center',
+      }}
+    >
+      <Skeleton
+        sx={{ bgcolor: 'grey.900' }}
+        variant="rectangular"
+        width={"100%"}
+        height={"100%"}
+        
+      />
+    </Box>
+    );
+  }
+  else{
+    
   return (
     
     <Container   maxWidth={false}  sx={{ ml:1,mt:1,mr: 1}} > {/* Align left with margin */}
@@ -1087,6 +1106,7 @@ function Dashboard() {
      
      </Container>
   );
+}
 }
 
 export default Dashboard;

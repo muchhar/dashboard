@@ -6,6 +6,7 @@ import PnlIcon from '@mui/icons-material/AttachMoneyTwoTone';
 import PercentIcon from '@mui/icons-material/Percent';
 import SignalCellularAltIcon from '@mui/icons-material/SignalCellularAlt';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
+import Skeleton from '@mui/material/Skeleton';
 
 import PortfolioIcon from '@mui/icons-material/PieChart';
 import BarChartIcon from '@mui/icons-material/BarChart';
@@ -383,6 +384,29 @@ function Analytics() {
     barGap: 0, // Minimal gap between bars
     categoryGapRatio: 0.1
   };
+  if(tradingData["For display graph"].length==0){
+    return(
+      <Box
+      sx={{
+        bgcolor: '#121212',
+        p: 8,
+        width: '100%',
+        display: 'flex',
+        height:700,
+        justifyContent: 'center',
+      }}
+    >
+      <Skeleton
+        sx={{ bgcolor: 'grey.900' }}
+        variant="rectangular"
+        width={"100%"}
+        height={"100%"}
+        
+      />
+    </Box>
+    );
+  }
+  else{
   
   return (
     <Container maxWidth={false} disableGutters  sx={{mr:1,ml:1,mt:1,  width:'100%'}} > {/* Align left with margin */}
@@ -617,7 +641,7 @@ function Analytics() {
        </Card>
  
      </Container>
-  );
+  );}
 }
 const chartSetting = {
     height: 300,

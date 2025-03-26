@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Skeleton from '@mui/material/Skeleton';
+
 import { Box, Container, Typography, Card, CardContent, Divider, Stack ,Button,useMediaQuery,Grid} from '@mui/material';
 import ShowChartIcon from '@mui/icons-material/TrendingUp';
 import PnlIcon from '@mui/icons-material/AttachMoneyTwoTone';
@@ -274,6 +276,30 @@ function Portfolio() {
   const handleChange2 = (event) => {
     setSymobl(event.target.value);
   };
+  if(tradingData["For display graph"].length==0){
+    return(
+      <Box
+      sx={{
+        bgcolor: '#121212',
+        p: 8,
+        width: '100%',
+        display: 'flex',
+        height:700,
+        justifyContent: 'center',
+      }}
+    >
+      <Skeleton
+        sx={{ bgcolor: 'grey.900' }}
+        variant="rectangular"
+        width={"100%"}
+        height={"100%"}
+        
+      />
+    </Box>
+    );
+  }
+  else{
+ 
   return (
     <Container maxWidth={false} disableGutters  sx={{ ml: 1,mt:1}} > {/* Align left with margin */}
       {/* Account Overview Title */}
@@ -952,7 +978,7 @@ function Portfolio() {
       {/* Trading Account Card */}
       
      </Container>
-  );
+  );}
   
 }
 const chartSetting = {

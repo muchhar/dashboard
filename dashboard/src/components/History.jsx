@@ -7,6 +7,7 @@ import PnlIcon from '@mui/icons-material/AttachMoneyTwoTone';
 import PercentIcon from '@mui/icons-material/Percent';
 import SignalCellularAltIcon from '@mui/icons-material/SignalCellularAlt';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
+import Skeleton from '@mui/material/Skeleton';
 
 import PortfolioIcon from '@mui/icons-material/PieChart';
 import BarChartIcon from '@mui/icons-material/BarChart';
@@ -110,6 +111,9 @@ function History() {
     "Average Loss":-447.90,
     "Max Drawdown":2047.902,
     "Sharpe ratio":1.80,
+    "For display graph":[
+     ],
+    
     "All Historical Data":[
       createData('BUY ', 0.1, "$1.08"	,"$1.55", "$12.89","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#22C05C","Mar 17, 2025 22:16"),
       createData( 'SELL', 1.25, "$1.26	","$1.50", "$39.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C","Mar 17, 2025 22:16"),
@@ -158,6 +162,12 @@ function History() {
           createData( 'SELL', 0.15, "$2320.50	","$2430.40", "$500.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C"),
           createData( 'BUY ', 2.0, "$232	","$250", "$-20.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444"),
         ],
+        "For display graph": response.data["For display graph"].x.map((date, index) => ({
+          x: date,          // Keep as string or convert to Date object if needed
+          y: response.data["For display graph"].y[index]
+        })) || tradingData["For display graph"]
+        ,
+       
        
 
     
@@ -238,6 +248,30 @@ function History() {
   const handleChange3 = (event) => {
     setDate(event.target.value);
   };
+  if(tradingData["For display graph"].length==0){
+    return(
+      <Box
+      sx={{
+        bgcolor: '#121212',
+        p: 8,
+        width: '100%',
+        display: 'flex',
+        height:700,
+        justifyContent: 'center',
+      }}
+    >
+      <Skeleton
+        sx={{ bgcolor: 'grey.900' }}
+        variant="rectangular"
+        width={"100%"}
+        height={"100%"}
+        
+      />
+    </Box>
+    );
+  }
+  else{
+  
   return (
     <Container maxWidth={false} disableGutters  sx={{ ml: 1,mr:1,pr:1 }} > {/* Align left with margin */}
       {/* Account Overview Title */}
@@ -590,7 +624,7 @@ function History() {
       </Card>
       
      </Container>
-  );
+  );}
 }
 
 export default History;
