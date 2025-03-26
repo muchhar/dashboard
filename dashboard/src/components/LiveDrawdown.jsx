@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import {
   Tabs,
   Tab,
@@ -42,16 +43,63 @@ const LiveDropdown = () => {
     { id: 4, alertName: "News Alert", account: "Account D", maxDrawdown: "2%" },
   ];
   
-  const accounts = Array.from({ length: 20 }, (_, i) => ({
-    id: `accountid${i + 1}`,
-    name: `Account ${i + 1}`,
-    balance: Math.floor(Math.random() * 10000),
-  }));
-  const accountData = Array.from({ length: 20 }, (_, i) => ({
-    accountId: `ACC${1000 + i}`, // Example: ACC1000, ACC1001, etc.
-    accountBalance: Math.floor(Math.random() * 100000), // Random balance between 0 and 100,000
-    drawdown:`-$${Math.floor(Math.random() * 100000)} (${Math.floor(Math.random() * 100)})` , // Random drawdown between 0 and 100
-  }));
+  const [accountNumbers, setAccountNumbers] = useState([]);
+  const [accountData, setAccountData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // 1. Fetch all account numbers first
+  useEffect(() => {
+    const fetchAccountNumbers = async () => {
+      try {
+        const response = await axios.get(
+          'https://mt4api.frequencee.io/cgi-bin/MT4AccountList.py'
+        );
+        setAccountNumbers(response.data);
+      } catch (err) {
+        setError('Failed to load account numbers');
+        console.error(err);
+      }
+    };
+
+    fetchAccountNumbers();
+  }, []);
+
+  // 2. Fetch data for each account
+  useEffect(() => {
+    if (accountNumbers.length === 0) return;
+
+    const fetchAllAccountData = async () => {
+      try {
+        setLoading(true);
+        const promises = accountNumbers.map(async (accountNumber) => {
+          const response = await axios.get(
+            `https://mt4api.frequencee.io/cgi-bin/MT4AccountData.py?FrequenceeID=${accountNumber}`
+          );
+          return {
+            accountId: `ACC${accountNumber}`,
+            ...response.data
+          };
+        });
+
+        const data = await Promise.all(promises);
+        setAccountData(data);
+      } catch (err) {
+        setError('Failed to load account details');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAllAccountData();
+  }, [accountNumbers]);
+
+  // const accountData = Array.from({ length: 20 }, (_, i) => ({
+  //   accountId: `ACC${1000 + i}`, // Example: ACC1000, ACC1001, etc.
+  //   accountBalance: Math.floor(Math.random() * 100000), // Random balance between 0 and 100,000
+  //   drawdown:`-$${Math.floor(Math.random() * 100000)} (${Math.floor(Math.random() * 100)})` , // Random drawdown between 0 and 100
+  // }));
   return (
     <Box sx={{  textAlign: "left",ml:2,mt:2,mr:2 }}>
       <Typography variant="h5"  fontWeight="bold" gutterBottom sx={{ textAlign: 'left',ml:0,pt:1 }}>
@@ -81,25 +129,34 @@ const LiveDropdown = () => {
         {tabValue === 0 && (
            
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-[1400px] pt-5 bg-black text-white text-base leading-6 font-inter">
-      {accountData.map(({ accountId, accountBalance, drawdown }) => (
+      {accountData.map((account) => (
         <div
-          key={accountId}
-          className="flex flex-col justify-between items-start min-h-[150px] bg-[#151818] border border-[#637260] rounded-2xl p-6"
+          key={account.accountId}
+          className="flex flex-col justify-between items-start min-h-[150px] bg-[#151818] border border-[#637260] rounded-2xl p-6 hover:border-[#80ee64] transition-colors"
         >
           {/* Account ID */}
-          <h2 className="text-2xl leading-8 font-degular font-normal">
-            {accountId}
+          <h2 className="text-2xl leading-8 font-degular font-normal mb-2">
+            {account.accountId}
           </h2>
 
           {/* Account Balance */}
-          <p className="text-lg leading-6 text-[#80ee64]">
-            Balance: ${accountBalance.toLocaleString()}
+          <p className="text-lg leading-6 text-[#80ee64] mb-2">
+            Balance: ${account.Balance?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
 
           {/* Drawdown */}
-          <p className="text-sm leading-[21px] text-[#ddffdc]/60 font-inter">
-            Drawdown: {drawdown}%
+          <p className={`text-sm leading-[21px] ${
+            account['Max Drawdown'] < 0 ? 'text-[#EF4444]' : 'text-[#80ee64]'
+          }`}>
+            Drawdown: {account['Max Drawdown']?.toFixed(2)}%
           </p>
+
+          {/* Additional Metrics */}
+          <div className="mt-3 pt-3 border-t border-[#637260]/50 w-full">
+            <p className="text-xs text-[#ddffdc]/60">Win Rate: {account['Win Rate']}%</p>
+            <p className="text-xs text-[#ddffdc]/60">Trades: {account['Total Trade']}</p>
+            <p className="text-xs text-[#ddffdc]/60">Profit: ${account['Total Profit']?.toFixed(2)}</p>
+          </div>
         </div>
       ))}
     </div>
