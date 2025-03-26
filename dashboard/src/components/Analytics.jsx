@@ -235,7 +235,13 @@ function Analytics() {
   const fetchTradingData = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get('https://mt4api.frequencee.io/cgi-bin/MT4AccountData.py?FrequenceeID=103');
+      const account = localStorage.getItem("selectedAccount");
+      var accountSel=103;
+      if (account) {
+        accountSel=account;
+      }
+      
+      const response = await axios.get('https://mt4api.frequencee.io/cgi-bin/MT4AccountData.py?FrequenceeID='+accountSel.toLocaleString());
       const winLossStats = calculateWinLossPercentage(response.data["All Historical Data"] || []);
 
 

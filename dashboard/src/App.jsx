@@ -17,6 +17,7 @@ import {  useMediaQuery, IconButton } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu'; 
 import LoginSignup from './components/LoginSignup';
 import Appbar from './components/Appbar'
+import AccountSelector from './components/SelectAccount';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 function DashboardPage() {
@@ -91,6 +92,7 @@ function App() {
     return (
       <Router>
       <Appbar />
+      <AccountSelector/>
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/trade-history" element={<History />} />
