@@ -338,7 +338,7 @@ function Portfolio() {
       </Typography>
       <Stack direction="row" display={'flex'} spacing={2}>
       <Typography variant="h6" fontWeight={700} sx={{ fontFamily: 'system-ui',fontSize:'24px' }}>
-      ${tradingData["Balance"]}
+      ${tradingData["Balance"].toFixed(2)}
       </Typography>
       <Box display={'flex'} sx={{pt:1.5}}>
       {tradingData["Total Profit"] >= 0 ? (
@@ -347,7 +347,7 @@ function Portfolio() {
   <TrendingDownIcon sx={{ color: '#EF4444', fontSize: 24, pl: 0.5 }} />
 )}
       <Typography variant="body2" sx={{ fontFamily: 'system-ui',color: tradingData["Total Profit"]>=0?'#22C05C':'#EF4444' }}>
-      {tradingData["Total Profit"]} ({((tradingData["Total Profit"]/tradingData["Balance"])*100).toFixed(2)}%)
+      {tradingData["Total Profit"].toFixed(2)} ({((tradingData["Total Profit"]/tradingData["Balance"])*100).toFixed(2)}%)
       </Typography>
       </Box>
       </Stack>
@@ -436,7 +436,7 @@ function Portfolio() {
               variant="body2"
               sx={{ color:tradingData["Total Profit"]>=0? '#22C05C':'#EF4444', fontSize: 24, fontFamily: 'system-ui', margin: 0, pt: 0, fontWeight: 700 }}
             >
-              ${tradingData["Total Profit"]}
+              ${tradingData["Total Profit"].toFixed(2)}
             </Typography>
           </Box>
         </CardContent>
@@ -684,7 +684,7 @@ function Portfolio() {
                 variant="body2"
                 sx={{ color: '#FFFFFF', fontSize: 20, fontFamily: 'system-ui', margin: 0, pt: 0, fontWeight: 700 }}
               >
-                {tradingData["Sharpe ratio"]}
+                {tradingData["Sharpe ratio"].toFixed(2)}
               </Typography>
             </Box>
             <Typography
@@ -732,7 +732,7 @@ function Portfolio() {
                 variant="body2"
                 sx={{ color: '#EF4444', fontSize: 24, fontFamily: 'system-ui', margin: 0, pt: 0, fontWeight: 700 }}
               >
-                {tradingData["Max Drawdown"]}%
+                {tradingData["Max Drawdown"].toFixed(2)}%
               </Typography>
             </Box>
             <Typography

@@ -1,4 +1,5 @@
 import React, { useState,useEffect } from 'react';
+import axios from 'axios';
 import { Box, Container, Typography, Card, CardContent, Divider, Stack ,Button,Dialog, DialogTitle, DialogContent,useMediaQuery,Grid} from '@mui/material';
 import ShowChartIcon from '@mui/icons-material/TrendingUp';
 import PnlIcon from '@mui/icons-material/AttachMoneyTwoTone';
@@ -43,6 +44,48 @@ import {  Icon3, Icon4, Icon5, Icon6 } from "./icons"; // Assuming icons are imp
 import Icon1 from '@mui/icons-material/ChevronLeft';
 import Icon2 from '@mui/icons-material/ChevronRight';
 const series = [{ data: [100, -200, 300, 500, -300, -100] }];
+const transformToHourlyProfit = (trades) => {
+  // Initialize hours with 0 profit
+  const hourlyProfit = Array(24).fill().map((_, i) => ({ x: i, y: 0 }));
+  
+  trades.forEach(trade => {
+    const hour = new Date(trade["Open Time"]).getHours();
+    hourlyProfit[hour].y += trade.Profit;
+  });
+
+  // Filter out hours with no trades if needed
+  return hourlyProfit;
+  // OR return hourlyProfit.filter(hour => hour.y !== 0); // Only hours with trades
+};
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+
+const transformApiData = (apiData) => {
+  return apiData.map((position) => {
+    const isBuy = position.Type === "BUY";
+    
+    return {
+      type: position.Type,
+      lot: position["Lot Size"],
+      entry: `$${position["Entry Price"].toFixed(2)}`,
+      exit: `$${position["Exit Price"].toFixed(2)}`,
+      profit: `$${position.Profit.toFixed(2)}`,
+      time: formatDate(position["Open Time"]),
+      tcolor: isBuy ? "#22C05C" : "#EF4444",
+      ticon: isBuy ? CallMadeIcon : CallReceivedIcon, // ✅ Valid component
+      pcolor: position.Profit >= 0 ? "#22C05C" : "#EF4444",
+      ctime: formatDate(position['Close Time'])
+    };
+  });
+};
 
 function createData(symbol, type, lot, entry, exit,profit,time,tcolor,ticon,pcolor,ctime) {
   return { symbol, type, lot, entry, exit,profit,time,tcolor,ticon,pcolor,ctime };
@@ -50,7 +93,63 @@ function createData(symbol, type, lot, entry, exit,profit,time,tcolor,ticon,pcol
 function createDataTab2(symbol, total, winrate, netprofit, avgprofit,ncolor,acolor) {
   return { symbol, total, winrate, netprofit, avgprofit,ncolor,acolor };
 }
+const transformDaysData = (dowData) => {
+  const daysOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  const shortDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  
+  return daysOrder.map((day, index) => {
+    const value = dowData[day] || 0;
+    return {
+      month: shortDays[index],
+      seoul: value,
+      seoul_positive: value >= 0 ? value : null,
+      seoul_negative: value < 0 ? value : null
+    };
+  });
+};
+const formatToShortDate = (dateStr) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', { 
+    month: 'short',  // "Mar"
+    day: 'numeric'   // "22"
+  }).replace(',', ''); // Remove comma if present
+};
+const analyzeTradingDays = (trades) => {
+  if (!trades?.length) return {};
+  
+  const dailyProfits = {};
+  
+  trades.forEach(trade => {
+    const date = new Date(trade["Open Time"]);
+    // Format as "Mar 24"
+    const dayKey = date.toLocaleDateString('default', { month: 'short', day: 'numeric' });
+    
+    if (!dailyProfits[dayKey]) {
+      dailyProfits[dayKey] = 0;
+    }
+    dailyProfits[dayKey] += trade.Profit;
+  });
 
+  const days = Object.entries(dailyProfits);
+  const profitableDays = days.filter(([_, profit]) => profit > 0);
+  const unprofitableDays = days.filter(([_, profit]) => profit < 0);
+  
+  const maxDay = days.reduce((max, current) => 
+    current[1] > max[1] ? current : max, ['', -Infinity]);
+  
+  const minDay = days.reduce((min, current) => 
+    current[1] < min[1] ? current : min, ['', Infinity]);
+
+  return {
+    totalProfitableDays: profitableDays.length,
+    totalUnprofitableDays: unprofitableDays.length,
+    maxProfitDay: [maxDay[1], maxDay[0]],  // [87.36, "Mar 24"]
+    minProfitDay: [minDay[1], minDay[0]],   // [-3.22, "Mar 25"]
+    profitableDayPercentage: (profitableDays.length / days.length) * 100,
+    unprofitableDayPercentage: (unprofitableDays.length / days.length) * 100,
+    allDays: days.length
+  };
+};
  
 const rows = [
   createData('EURUSD','BUY ', 0.1, "$1.08"	,"$1.55", "$12.89","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#22C05C","Mar 17, 2025 22:16"),
@@ -137,6 +236,167 @@ function Pnlanalysis() {
   const isLargeScreen = useMediaQuery('(min-width: 1024px)'); // >= 1024px
   const isMediumScreen = useMediaQuery('(min-width: 766px) and (max-width: 1023px)'); // 766px - 1023px
   const isSmallScreen = useMediaQuery('(max-width: 765px)'); // <= 765px
+  const [tradingData, setTradingData] = useState({
+    Balance: 10000.56,
+    "Margin Level": 2050.15,
+    Equity: 10250.75,
+    "Free Margin": 9750.75,
+    "Total Profit": 500.25,
+    "Win Rate":80.02,
+    "Profit Factor":2.46,
+    "Total Trade":12,
+    "Average Win":1089.77,
+    "Average Loss":-447.90,
+    "Max Drawdown":2047.902,
+    "Sharpe ratio":1.80,
+    "For display graph":[
+      // { x: "2025-03-24", y: 2 },
+      // { x: "2025-03-23", y: 5.5 },
+      // { x: "2025-03-20", y: 2 },
+      // { x: "2025-03-19", y: 8.5 },
+      // { x: "2025-03-18", y: 1.5 },
+      // { x: "2025-03-18", y: 5 },
+    ],
+     "series" : [{ data: [ -200, 300, 500, -300, -100] }],
+     "profit day":0,
+     "unprodit days":0,
+     "prodit day percentage":0.0,
+     "unprofit percentage":0.0,
+     "maxProfitDay":[0,''],
+     "minProfitDay":[0,''],
+     "Hour Chart":[],
+     "Days Data":[],
+     "All Historical Data":[
+     ],
+     "Calender":[]
+        
+
+   
+
+
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchTradingData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get('https://mt4api.frequencee.io/cgi-bin/MT4AccountData.py?FrequenceeID=103');
+      
+      // Update state with new data
+      setTradingData({
+        Balance: response.data.Balance || tradingData.Balance,
+        "Margin Level": response.data["Margin Level"] || tradingData["Margin Level"],
+        Equity: response.data.Equity || tradingData.Equity,
+        "Free Margin": response.data["Free Margin"] || tradingData["Free Margin"],
+        "Total Profit": response.data["Total Profit"] || tradingData["Total Profit"],
+        "Win Rate":response.data["Win Rate"] || tradingData["Win Rate"],
+        "Profit Factor":response.data["Profit Factor"] || tradingData["Profit Factor"],
+        "Total Trade":response.data["Total Trade"] || tradingData["Total Trade"],
+        "Average Win":response.data["Average Win"] || tradingData["Average Win"],
+        "Average Loss":response.data["Average Loss"] || tradingData["Average Loss"],
+        "Max Drawdown":response.data["Max Drawdown"] || tradingData["Max Drawdown"],
+        "Sharpe ratio":response.data["Sharpe ratio"] || tradingData["Sharpe ratio"],
+        
+        "For display graph": response.data["For display graph"].x.map((date, index) => ({
+          x: formatToShortDate(date),          // Keep as string or convert to Date object if needed
+          y: response.data["For display graph"].y[index]
+        })) || tradingData["For display graph"]
+        ,
+        "series" :[{ data: [ response.data["DoW PL Info"]["Monday"], 
+          response.data["DoW PL Info"]["Tuesday"], 
+          response.data["DoW PL Info"]["Wednesday"], 
+          response.data["DoW PL Info"]["Thursday"],
+          response.data["DoW PL Info"]["Friday"], 
+          
+        ] }]
+        ||[{ data: [ -200, 300, 500, -300, -100] }],
+
+        "profit day": analyzeTradingDays(response.data["All Historical Data"]).totalProfitableDays,
+        "unprodit days": analyzeTradingDays(response.data["All Historical Data"]).totalUnprofitableDays,
+        "prodit day percentage": analyzeTradingDays(response.data["All Historical Data"]).profitableDayPercentage,
+        "unprofit percentage": analyzeTradingDays(response.data["All Historical Data"]).unprofitableDayPercentage,
+        "maxProfitDay": analyzeTradingDays(response.data["All Historical Data"]).maxProfitDay,
+        "minProfitDay": analyzeTradingDays(response.data["All Historical Data"]).minProfitDay,
+        "Hour Chart": transformToHourlyProfit(response.data["All Historical Data"] || []),
+        "Days Data": transformDaysData(response.data["DoW PL Info"]) || tradingData["Days Data"],
+        "All Historical Data": transformApiData(response.data["All Historical Data"])||
+        [
+        ],
+        "Calender":response.data["For display graph"].x.map((date, i) => ({ 
+          date, 
+          profit: response.data["For display graph"].y[i] 
+        })) || []
+        
+       
+        
+
+    
+        
+    
+      });
+
+      
+      setError(null);
+     // console.log(transformApiData(response.data["Position Info"]));
+    } catch (err) {
+      console.error('Error fetching trading data:', err);
+      setError('Failed to fetch trading data');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // Fetch data immediately on component mount
+    fetchTradingData();
+
+    // Set up periodic polling (every 5 seconds)
+    const intervalId = setInterval(fetchTradingData, 5000);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(intervalId);
+  }, []); // Empty dependency array means this effect runs once on mount and sets up recurring calls
+
+  const exportToCSV = () => {
+    // Prepare CSV headers
+    const headers = [
+      'Type',
+      'Lot Size',
+      'Entry Price',
+      'Exit Price',
+      'Profit',
+      'Open Time',
+      'Close Time'
+      
+    ].join(',');
+
+    // Prepare CSV rows
+    const rows = tradingData['All Historical Data'].map(item => [
+      `"${item.type}"`,
+      item.lot,
+      `"${item.entry}"`,
+      `"${item.exit}"`,
+      `"${item.profit}"`,
+      `"${item.time}"`,
+      `"${item.ctime}"`,
+      
+    ].join(','));
+
+    // Combine headers and rows
+    const csvContent = [headers, ...rows].join('\n');
+
+    // Create download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'trading_data.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // Determine the number of columns based on screen size
   const columns = isLargeScreen ? 4 : isMediumScreen ? 2 : 1;
@@ -188,7 +448,7 @@ function Pnlanalysis() {
     const dateString = `${currentDate.getFullYear()}-${String(
       currentDate.getMonth() + 1
     ).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-    const profitEntry = profitData.find((entry) => entry.date === dateString);
+    const profitEntry = tradingData["Calender"].find((entry) => entry.date === dateString);
     const profit = profitEntry ? profitEntry.profit : null;
 
     calendarDays.push(
@@ -452,7 +712,7 @@ function Pnlanalysis() {
             </div>
             </Box>
         {/* Export Button */}
-        <button style={{height:'40px'}} className="flex items-center justify-center gap-2 bg-[#1e2026] text-white text-base leading-6 cursor-pointer transition-all duration-150 border border-[#637260] rounded-lg px-4 py-2 hover:border-[#80ee64]">
+        <button style={{height:'40px'}} onClick={exportToCSV} className="flex items-center justify-center gap-2 bg-[#1e2026] text-white text-base leading-6 cursor-pointer transition-all duration-150 border border-[#637260] rounded-lg px-4 py-2 hover:border-[#80ee64]">
           <FileDownloadOutlinedIcon className="text-[#a7b1c2]" />
           Export
         </button>
@@ -567,7 +827,7 @@ function Pnlanalysis() {
             </Box>
         {/* Export Button */}
         <div className='w-full pr-5'>
-        <button style={{height:'40px',marginTop:'8px'}} className="w-full flex items-center justify-center gap-2 bg-[#1e2026] text-white text-base leading-6 cursor-pointer transition-all duration-150 border border-[#637260] rounded-lg px-4 py-2 hover:border-[#80ee64]">
+        <button onClick={exportToCSV} style={{height:'40px',marginTop:'8px'}} className="w-full flex items-center justify-center gap-2 bg-[#1e2026] text-white text-base leading-6 cursor-pointer transition-all duration-150 border border-[#637260] rounded-lg px-4 py-2 hover:border-[#80ee64]">
           <FileDownloadOutlinedIcon className="text-[#a7b1c2]" />
           Export
         </button>
@@ -598,19 +858,20 @@ function Pnlanalysis() {
               >
                 Total P&L
               </Typography>
-              <ShowChartIcon
-                sx={{
-                  color: '#4caf50',
-                  borderRadius: '50%',
-                  padding: '0px',
-                }}
-              />
+              {tradingData["Total Profit"] >= 0 ? (
+                  <ShowChartIcon sx={{ color: '#4caf50', borderRadius: '50%',
+                    padding: '0px', }} />
+                ) : (
+                  <TrendingDownIcon sx={{ color: '#EF4444', borderRadius: '50%',
+                    padding: '0px', }} />
+                )}
+              
             </Box>
 
             {/* Profit & Loss */}
             <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ pt: 1 }}>
-              <Typography variant="h5" marginLeft={0} fontWeight="bold" gutterBottom sx={{ color: '#7FED64' }}>
-                $2047.902
+              <Typography variant="h5" marginLeft={0} fontWeight="bold" gutterBottom sx={{ color: tradingData["Total Profit"]>=0? '#7FED64':'#EF4444' }}>
+                ${(tradingData["Total Profit"]).toFixed(2)}
               </Typography>
             </Box>
           </CardContent>
@@ -652,7 +913,7 @@ function Pnlanalysis() {
             {/* Profit & Loss */}
             <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ pt: 1 }}>
               <Typography variant="h5" marginLeft={0} fontWeight="bold" gutterBottom>
-                80.02%
+                {tradingData["Win Rate"]}%
               </Typography>
             </Box>
           </CardContent>
@@ -695,7 +956,7 @@ function Pnlanalysis() {
             {/* Profit & Loss */}
             <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ pt: 1 }}>
               <Typography variant="h5" marginLeft={0} fontWeight="bold" gutterBottom>
-                246
+                {tradingData["Total Trade"]}
               </Typography>
             </Box>
           </CardContent>
@@ -737,7 +998,7 @@ function Pnlanalysis() {
             {/* Profit & Loss */}
             <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ pt: 1 }}>
               <Typography variant="h5" marginLeft={0} fontWeight="bold" gutterBottom sx={{ color: '#7FED64' }}>
-                $58.88
+                ${(tradingData["Average Win"]).toFixed(2)}
               </Typography>
             </Box>
           </CardContent>
@@ -776,8 +1037,8 @@ function Pnlanalysis() {
 
           {/* Line Chart */}
           <LineChart
-            dataset={dataset}
-            xAxis={[{ dataKey: 'x' }]}
+            dataset={tradingData['For display graph']}
+            xAxis={[{ dataKey: 'x' ,scaleType: 'band'}]}
             series={[{ dataKey: 'y', color: '#22C05C' }]}
             height={300}
             margin={{ left: 30, right: 30, top: 30, bottom: 30 }}
@@ -811,23 +1072,20 @@ function Pnlanalysis() {
 
           {/* Bar Chart */}
           <BarChart
-            dataset={combinedData2}
-            xAxis={[{ scaleType: 'band', dataKey: 'month' }]}
+            dataset={tradingData["Hour Chart"]}
+            xAxis={[{ scaleType: 'band', dataKey: 'x' }]}
             series={[
               {
-                dataKey: "value_positive",
-                valueFormatter,
-                itemStyle: {
-                  fill: "#4CAF50", // Green for positive
-                },
+                dataKey: "y",
+                
               },
-              {
-                dataKey: "value_negative",
-                valueFormatter,
-                itemStyle: {
-                  fill: "red", // Red for negative
-                },
-              },
+              // {
+              //   dataKey: "value_negative",
+              //   valueFormatter,
+              //   itemStyle: {
+              //     fill: "red", // Red for negative
+              //   },
+              // },
             ]}
             {...chartSetting}
           />
@@ -901,24 +1159,22 @@ function Pnlanalysis() {
            
          </Box>
          <BarChart
-        dataset={combinedData}
-        yAxis={[{ scaleType: 'band', dataKey: 'month' }]}
-        series={[
-          { 
-            dataKey: 'seoul_positive', 
-            valueFormatterday,
-            color: '#4CAF50', // Green for positive
-            
-          },
-          { 
-            dataKey: 'seoul_negative', 
-            valueFormatterday,
-            color: '#F44336', // Red for negative
-            
-          }
-        ]}
-        layout="horizontal"
-        {...chartSetting2}
+         dataset={tradingData["Days Data"]}
+              yAxis={[{ scaleType: 'band', dataKey: 'month' }]}
+              series={[
+                { 
+                  dataKey: 'seoul_positive', 
+                  color: '#4CAF50', // Green for positive
+                  label: 'Profit'
+                },
+                { 
+                  dataKey: 'seoul_negative', 
+                  color: '#F44336', // Red for negative
+                  label: 'Loss'
+                }
+              ]}
+              layout="horizontal"
+             {...chartSetting2}
       />
        <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}></div>
         </CardContent>
@@ -992,18 +1248,18 @@ function Pnlanalysis() {
                     fontWeight: 700
                   }}
                 >
-                  {index === 1 ? '27' :
-                    index === 2 ? '4' :
-                      index === 3 ? '$146.27' : '$-49.40'}
+                  {index === 1 ? tradingData["profit day"] :
+                    index === 2 ? tradingData["unprodit days"] :
+                      index === 3 ? '$'+ tradingData["maxProfitDay"][0].toFixed(2).toLocaleString() : '$'+tradingData["minProfitDay"][0].toFixed(2).toLocaleString()}
                 </Typography>
               </Box>
               <Typography
                 variant="body2"
                 sx={{ color: '#A7B1C1',textAlign:'left', fontSize: 14, fontFamily: 'system-ui', margin: 0, pt: 1 }}
               >
-                {index === 1 ? '87.1% of total days' :
-                  index === 2 ? '12.9% of total days' :
-                    index === 3 ? 'Mar 12' : 'Feb 28'}
+                {index === 1 ? tradingData["prodit day percentage"].toFixed(0).toLocaleString()+'% of total days' :
+                  index === 2 ? tradingData["unprofit percentage"].toFixed(0).toLocaleString()+'% of total days' :
+                    index === 3 ? tradingData["maxProfitDay"][1] : tradingData["minProfitDay"][1]}
               </Typography>
             </CardContent>
           </Card>
@@ -1022,13 +1278,11 @@ const chartSetting = {
     {
       colorMap: {
         type: 'continuous',
-        min: -10,
-        max: 10,
         color: ['#80ee64', '#80ee64'],
       },
     },
   ],
-  series: [{ dataKey: 'seoul', valueFormatter }],
+  series: [{ dataKey: 'y' }],
   height: 300,
   sx: {
    

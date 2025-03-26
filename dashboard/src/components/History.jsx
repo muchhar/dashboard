@@ -348,7 +348,7 @@ function History() {
           {/* Value */}
           <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ pt: 1 }}>
             <Typography variant="h5" marginLeft={0} fontWeight="bold" gutterBottom sx={{ color: tradingData['Total Profit'] >= 0 ? '#22C05C' : '#EF4444' }}>
-              ${tradingData['Total Profit']}
+              ${tradingData['Total Profit'].toFixed(2)}
             </Typography>
           </Box>
         </CardContent>
@@ -377,7 +377,7 @@ function History() {
           {/* Value */}
           <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ pt: 1 }}>
             <Typography variant="h5" marginLeft={0} fontWeight="bold" gutterBottom sx={{ color: tradingData['Average Win'] >= 0 ? '#22C05C' : '#EF4444' }}>
-              ${(tradingData['Average Win']+tradingData['Average Loss'])/tradingData['Total Trade']}
+              ${((tradingData['Average Win']+tradingData['Average Loss'])/tradingData['Total Trade']).toFixed(2)}
             </Typography>
           </Box>
         </CardContent>

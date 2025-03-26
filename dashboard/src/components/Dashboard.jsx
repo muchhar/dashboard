@@ -431,7 +431,7 @@ function Dashboard() {
             <Typography variant="body2" color="textSecondary" fontSize={18}>
               P/L
             </Typography>
-            <Typography variant="h6"   fontWeight={700} sx={{color: tradingData["Total Profit"] >= 0 ? '#80ee64' : 'red'}}>${tradingData["Total Profit"].toLocaleString()}</Typography>
+            <Typography variant="h6"   fontWeight={700} sx={{color: tradingData["Total Profit"] >= 0 ? '#80ee64' : 'red'}}>${tradingData["Total Profit"].toFixed(2).toLocaleString()}</Typography>
           </Box>
         </CardContent>
       </Card>
@@ -440,13 +440,13 @@ function Dashboard() {
       </Typography>
       <Grid container spacing={2} sx={{ mt: 1, ml: -1,pr:1 }}>
       {[
-        { title: 'Total Profit', value: '$'+tradingData["Total Profit"].toLocaleString(), icon: <ShowChartIcon color="#4caf50" /> },
+        { title: 'Total Profit', value: '$'+tradingData["Total Profit"].toFixed(2).toLocaleString(), icon: <ShowChartIcon color="#4caf50" /> },
         { title: 'Win Rate', value: tradingData["Win Rate"].toLocaleString()+'%', icon: <PortfolioIcon color="#0D49D6" /> },
         { title: 'Profit Factor', value: tradingData["Profit Factor"].toLocaleString(), icon: <BarChartIcon color="#0D49D6" /> },
         { title: 'Total Trade', value: tradingData["Total Trade"].toLocaleString(), icon: <FunctionsIcon color="#A7B1C1" /> },
-        { title: 'Average Win', value: '$'+tradingData["Average Win"].toLocaleString(), icon: <CallMadeIcon color="#80ee64" />, color: '#80ee64' },
-        { title: 'Average Loss', value: '$'+tradingData["Average Loss"].toLocaleString(), icon: <CallReceivedIcon color="#EF4444" />, color: '#EF4444' },
-        { title: 'Max Drawdown', value: '$'+tradingData["Max Drawdown"].toLocaleString(), icon: <WarningAmberOutlinedIcon color="#4caf50" />, color: '#4caf50' },
+        { title: 'Average Win', value: '$'+tradingData["Average Win"].toFixed(2).toLocaleString(), icon: <CallMadeIcon color="#80ee64" />, color: '#80ee64' },
+        { title: 'Average Loss', value: '$'+tradingData["Average Loss"].toFixed(2).toLocaleString(), icon: <CallReceivedIcon color="#EF4444" />, color: '#EF4444' },
+        { title: 'Max Drawdown', value: '$'+tradingData["Max Drawdown"].toFixed(2).toLocaleString(), icon: <WarningAmberOutlinedIcon color="#4caf50" />, color: '#4caf50' },
         { title: 'Sharpe Ratio', value: tradingData["Sharpe ratio"].toLocaleString(), icon: <ShowChartOutlinedIcon color="#0D49D6" /> },
       ].map((card, index) => (
         <Grid item xs={12 / cardsPerRow} key={index}>
@@ -854,7 +854,7 @@ function Dashboard() {
                   variant="body2"
                   sx={{ color: tradingData["sessions"]["Asian"]["Total Profit"]>=0?'#22C05C':'#EF4444', fontSize: 18, fontFamily: 'system-ui', margin: 0 }}
                 >
-                  ${tradingData["sessions"]["Asian"]["Total Profit"]}
+                  ${tradingData["sessions"]["Asian"]["Total Profit"].toFixed(2)}
                 </Typography>
               
               </Box>
@@ -900,7 +900,7 @@ function Dashboard() {
                   variant="body2"
                   sx={{ color: tradingData['sessions']['Asian']['Avg. Profit/Trade'] >= 0 ? '#22C05C' : '#EF4444', fontSize: 18, fontFamily: 'system-ui', margin: 0 }}
                 >
-                  ${tradingData['sessions']['Asian']['Avg. Profit/Trade']}
+                  ${tradingData['sessions']['Asian']['Avg. Profit/Trade'].toFixed(2)}
                 </Typography>
               </Box>
             </CardContent>
@@ -940,7 +940,7 @@ function Dashboard() {
                   variant="body2"
                   sx={{ color: tradingData["sessions"]["London"]["Total Profit"]>=0?'#22C05C':'#EF4444', fontSize: 18, fontFamily: 'system-ui', margin: 0 }}
                 >
-                  ${tradingData["sessions"]["London"]["Total Profit"]}
+                  ${tradingData["sessions"]["London"]["Total Profit"].toFixed(2)}
                 </Typography>
               
               </Box>
@@ -986,7 +986,7 @@ function Dashboard() {
                   variant="body2"
                   sx={{ color: tradingData['sessions']['London']['Avg. Profit/Trade'] >= 0 ? '#22C05C' : '#EF4444', fontSize: 18, fontFamily: 'system-ui', margin: 0 }}
                 >
-                  ${tradingData['sessions']['London']['Avg. Profit/Trade']}
+                  ${tradingData['sessions']['London']['Avg. Profit/Trade'].toFixed(2)}
                 </Typography>
               </Box>
             </CardContent>
@@ -1026,7 +1026,7 @@ function Dashboard() {
                   variant="body2"
                   sx={{ color: tradingData["sessions"]["New York"]["Total Profit"]>=0?'#22C05C':'#EF4444', fontSize: 18, fontFamily: 'system-ui', margin: 0 }}
                 >
-                  ${tradingData["sessions"]["New York"]["Total Profit"]}
+                  ${tradingData["sessions"]["New York"]["Total Profit"].toFixed(2)}
                 </Typography>
               </Box>
 
@@ -1071,7 +1071,7 @@ function Dashboard() {
                   variant="body2"
                   sx={{  color: tradingData['sessions']['New York']['Avg. Profit/Trade'] >= 0 ? '#22C05C' : '#EF4444', fontSize: 18, fontFamily: 'system-ui', margin: 0 }}
                 >
-                  ${tradingData['sessions']['New York']['Avg. Profit/Trade']}
+                  ${tradingData['sessions']['New York']['Avg. Profit/Trade'].toFixed(2)}
                 </Typography>
               </Box>
             </CardContent>
