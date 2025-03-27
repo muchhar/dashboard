@@ -32,6 +32,7 @@ import Select from '@mui/material/Select';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import { BarChart } from '@mui/x-charts/BarChart';
+import NoDataFound from "./nodata.jsx";
 // Function to format numbers as currency
 const formatCurrency = (value) => `$${value.toFixed(2)}`;
 var x_load=true;
@@ -150,58 +151,50 @@ function Dashboard() {
   const [Symbols, setSymobl] = React.useState('');
   const [colorX, setColorX] = React.useState('piecewise');
   const [colorY, setColorY] = React.useState('None');
+  const [dataerror,setdataerror] = React.useState(false);
 
   //backend
   const [tradingData, setTradingData] = useState({
-    Balance: 10000.56,
-    "Margin Level": 2050.15,
-    Equity: 10250.75,
-    "Free Margin": 9750.75,
-    "Total Profit": 500.25,
-    "Win Rate":80.02,
-    "Profit Factor":2.46,
-    "Total Trade":12,
-    "Average Win":1089.77,
-    "Average Loss":-447.90,
-    "Max Drawdown":2047.902,
-    "Sharpe ratio":1.80,
+    Balance: 0,
+    "Margin Level": 0,
+    Equity: 0,
+    "Free Margin": 0,
+    "Total Profit": 0,
+    "Win Rate":0,
+    "Profit Factor":0,
+    "Total Trade":0,
+    "Average Win":0,
+    "Average Loss":0,
+    "Max Drawdown":0,
+    "Sharpe ratio":0,
     "For display graph":[
      ],
+     "For Loading":[],
     "Position Info":[
-      createData('BUY ', 0.1, "$1.08"	,"$1.55", "$12.89","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#22C05C"),
-      createData( 'SELL', 1.25, "$1.26	","$1.50", "$39.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C"),
-      createData( 'BUY ', 0.01, "$150.50","$200.40", "$-50.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444"),
-      createData( 'SELL', 0.15, "$2320.50	","$2430.40", "$500.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C"),
-      createData( 'BUY ', 2.0, "$232	","$250", "$-20.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444"),
-    ],
-     "series" : [{ data: [ -200, 300, 500, -300, -100] }],
+     ],
+     "series" : [{ data: [ ] }],
     "day table":[
-      createDataTab2('Monday',42, "61.8%"	,"$105", "$12.89","#22C05C","#22C05C"),
-      createDataTab2('Tuesday', 30, "80.02%","$150", "$39.62","#22C05C","#22C05C"),
-      createDataTab2('Wednesday', 120, "40.33%","$230.40", "$50.62","#22C05C","#22C05C"),
-      createDataTab2('Thursday', 66, "20.45%", "$-430.40", "$-50.62","#EF4444","#EF4444"),
-      createDataTab2('Friday', 30, "73.32%", "$-250", "$-20.62","#EF4444","#EF4444"),
     ],
     "sessions": {
       "Asian": {
-      "Total Trade": 40,
-      "Total Profit": 80.32,
-      "Win Rate": 68.40,
-      "Avg. Profit/Trade": 2.21,
+      "Total Trade": 0,
+      "Total Profit": 0,
+      "Win Rate": 0,
+      "Avg. Profit/Trade": 0,
       "Trades": []
       },
       "London": {
-      "Total Trade": 40,
-      "Total Profit": 832,
-      "Win Rate": 68.3,
+      "Total Trade": 0,
+      "Total Profit": 0,
+      "Win Rate": 0,
       "Avg. Profit/Trade": 0,
       "Trades": []
       },
       "New York": {
-      "Total Trade": 40,
-      "Total Profit": -18.32,
-      "Win Rate": 30.34,
-      "Avg. Profit/Trade": -9.18,
+      "Total Trade": 0,
+      "Total Profit": 0,
+      "Win Rate": 0,
+      "Avg. Profit/Trade": 0,
       "Trades": []
       }
       }
@@ -211,17 +204,37 @@ function Dashboard() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  var accountSel=103;
+      
   const fetchTradingData = async () => {
     try {
       setIsLoading(true);
       const account = localStorage.getItem("selectedAccount");
-      var accountSel=103;
+      
       if (account) {
         accountSel=account;
       }
+      console.log(accountSel);
       
       const response = await axios.get('https://mt4api.frequencee.io/cgi-bin/MT4AccountData.py?FrequenceeID='+accountSel.toLocaleString());
+      console.log(response.status);
+      if(response.status==200){
+        if(response.data){
+          console.log(response.data);
+          setdataerror(false);
+          
+        }else{
+          console.log("No data found");
+          setdataerror(true);
+          return;
+
+        }
+      }
+      else{
+        console.log("No data found");
+        setdataerror(true);
+        return;
+      }
       // Update state with new data
       setTradingData({
         Balance: response.data.Balance || tradingData.Balance,
@@ -244,11 +257,6 @@ function Dashboard() {
         ,
         "Position Info": transformApiData(response.data["Position Info"])||
         [
-          createData('BUY ', 0.1, "$1.08"	,"$1.55", "$12.89","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#22C05C"),
-          createData( 'SELL', 1.25, "$1.26	","$1.50", "$39.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C"),
-          createData( 'BUY ', 0.01, "$150.50","$200.40", "$-50.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444"),
-          createData( 'SELL', 0.15, "$2320.50	","$2430.40", "$500.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C"),
-          createData( 'BUY ', 2.0, "$232	","$250", "$-20.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444"),
         ],
         "series" :[{ data: [ response.data["DoW PL Info"]["Monday"], 
           response.data["DoW PL Info"]["Tuesday"], 
@@ -257,15 +265,11 @@ function Dashboard() {
           response.data["DoW PL Info"]["Friday"], 
           
         ] }]
-        ||[{ data: [ -200, 300, 500, -300, -100] }],
+        ||[{ data: [ ] }],
         "day table":transformHistoricalData(response.data["All Historical Data"]) ||[
-      createDataTab2('Monday',42, "61.8%"	,"$105", "$12.89","#22C05C","#22C05C"),
-      createDataTab2('Tuesday', 30, "80.02%","$150", "$39.62","#22C05C","#22C05C"),
-      createDataTab2('Wednesday', 120, "40.33%","$230.40", "$50.62","#22C05C","#22C05C"),
-      createDataTab2('Thursday', 66, "20.45%", "$-430.40", "$-50.62","#EF4444","#EF4444"),
-      createDataTab2('Friday', 30, "73.32%", "$-250", "$-20.62","#EF4444","#EF4444"),
-    ],
-        'sessions': response.data['Session Stats'] || tradingData['sessions']
+     ],
+        'sessions': response.data['Session Stats'] || tradingData['sessions'],
+        "For Loading":[1],
 
 
     
@@ -312,7 +316,10 @@ function Dashboard() {
   const handleChange2 = (event) => {
     setSymobl(event.target.value);
   };
-  if(tradingData["For display graph"].length==0){
+  if(dataerror){
+    return <NoDataFound message={"No data available for ACC"+localStorage.getItem("selectedAccount")}/>;
+  }
+ else if(tradingData["For Loading"].length==0){
     return(
       <Box
       sx={{

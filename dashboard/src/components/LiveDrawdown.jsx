@@ -13,6 +13,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import CloseIcon from '@mui/icons-material/Close';
 import { PlusIcon } from "./PlusIcon";
 import Skeleton from '@mui/material/Skeleton';
+import NoDataFound from "./nodata.jsx";
 
 const LiveDropdown = () => {
   const [tabValue, setTabValue] = useState(0);
@@ -29,6 +30,7 @@ const LiveDropdown = () => {
   const [accountNumbers, setAccountNumbers] = useState([]);
   const [accountData, setAccountData] = useState([]);
   const [loading, setLoading] = useState(true);
+ const [dataerror,setdataerror] = React.useState(false);
 
   // Load saved alerts from localStorage
   useEffect(() => {
@@ -75,6 +77,23 @@ const LiveDropdown = () => {
           const response = await axios.get(
             `https://mt4api.frequencee.io/cgi-bin/MT4AccountData.py?FrequenceeID=${accountNumber}`
           );
+          if(response.status==200){
+            if(response.data){
+              console.log(response.data);
+              setdataerror(false);
+              
+            }else{
+              console.log("No data found");
+              setdataerror(true);
+              return;
+    
+            }
+          }
+          else{
+            console.log("No data found");
+            setdataerror(true);
+            return;
+          }
           return {
             accountId: `ACC${accountNumber}`,
             ...response.data
@@ -197,7 +216,6 @@ const LiveDropdown = () => {
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
-
   return (
     <Box sx={{ textAlign: "left", ml:2, mt:2, mr:2 }}>
       <ToastContainer />
@@ -220,34 +238,61 @@ const LiveDropdown = () => {
         <Tab label="Account" />
         <Tab label="Alert" />
       </Tabs>
-      
       <Box sx={{ mt: 2 }}>
-        {tabValue === 0 && (
+        {tabValue === 0 &&  (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-[1400px] pt-5 text-white text-base leading-6 font-inter">
-            {accountData.map((account) => (
-              <div
-                key={account.accountId}
-                className="flex flex-col justify-between items-start min-h-[150px] bg-[#151818] border border-[#637260] rounded-2xl p-6 hover:border-[#80ee64] transition-colors"
-              >
-                <h2 className="text-2xl leading-8 font-degular font-normal mb-2">
-                  {account.accountId}
-                </h2>
-                <p className="text-lg leading-6 text-[#80ee64] mb-2">
-                  Balance: ${account.Balance?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </p>
-                <p className={`text-sm leading-[21px] ${
-                  account['Max Drawdown'] < 0 ? 'text-[#EF4444]' : 'text-[#80ee64]'
-                }`}>
-                  Drawdown: {account['Max Drawdown']?.toFixed(2)}%
-                </p>
-                <div className="mt-3 pt-3 border-t border-[#637260]/50 w-full">
-                  <p className="text-xs text-[#ddffdc]/60">Win Rate: {account['Win Rate']}%</p>
-                  <p className="text-xs text-[#ddffdc]/60">Trades: {account['Total Trade']}</p>
-                  <p className="text-xs text-[#ddffdc]/60">Profit: ${account['Total Profit']?.toFixed(2)}</p>
-                </div>
-              </div>
-            ))}
-            {accountData.length==0 && (
+            {accountData
+  .filter(account => account && account.accountId) // Filter out null/undefined accounts
+  .map((account) => {
+    // Validate required fields with fallbacks
+    const balance = account.Balance !== undefined ? 
+      account.Balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 
+      'N/A';
+      
+    const drawdown = account['Max Drawdown'] !== undefined ? 
+      parseFloat(account['Max Drawdown']) : 
+      null;
+
+    const winRate = account['Win Rate'] !== undefined ? 
+      account['Win Rate'] : 
+      'N/A';
+
+    const totalTrades = account['Total Trade'] !== undefined ? 
+      account['Total Trade'] : 
+      'N/A';
+
+    const totalProfit = account['Total Profit'] !== undefined ? 
+      account['Total Profit'].toFixed(2) : 
+      'N/A';
+
+    return (
+      <div
+        key={account.accountId}
+        className="flex flex-col justify-between items-start min-h-[150px] bg-[#151818] border border-[#637260] rounded-2xl p-6 hover:border-[#80ee64] transition-colors"
+      >
+        <h2 className="text-2xl leading-8 font-degular font-normal mb-2">
+          {account.accountId || 'Unknown Account'}
+        </h2>
+        
+        <p className="text-lg leading-6 text-[#80ee64] mb-2">
+          Balance: ${balance}
+        </p>
+        
+        <p className={`text-sm leading-[21px] ${
+          drawdown !== null && drawdown < 0 ? 'text-[#EF4444]' : 'text-[#80ee64]'
+        }`}>
+          Drawdown: {drawdown !== null ? `${drawdown.toFixed(2)}%` : 'N/A'}
+        </p>
+        
+        <div className="mt-3 pt-3 border-t border-[#637260]/50 w-full">
+          <p className="text-xs text-[#ddffdc]/60">Win Rate: {winRate}%</p>
+          <p className="text-xs text-[#ddffdc]/60">Trades: {totalTrades}</p>
+          <p className="text-xs text-[#ddffdc]/60">Profit: ${totalProfit}</p>
+        </div>
+      </div>
+    );
+  })
+}{accountData.length==0 && (
                 <Skeleton animation="wave" />
             )
             }

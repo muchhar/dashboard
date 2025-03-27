@@ -34,9 +34,11 @@ const AccountSelector = () => {
 
   const handleAccountSelect = (account) => {
     setSelectedAccount(account);
-    localStorage.setItem("selectedAccount", account.toString());
+    //localStorage.setItem("selectedAccount", account.toString());
+    localStorage.setItem("selectedAccount", account);
+    
     setIsOpen(false);
-    navigate("/"); // Redirect to trading page (adjust as needed)
+    window.location.reload(); // Redirect to trading page (adjust as needed)
   };
 
   return (

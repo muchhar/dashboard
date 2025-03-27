@@ -18,6 +18,7 @@ import { BarChart } from '@mui/x-charts/BarChart';
 import { PieChart } from '@mui/x-charts/PieChart';
 import { dataset2 } from './profit';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
+import NoDataFound from "./nodata.jsx";
 
 function createData(symbol, type, lot, entry, exit,profit,time,tcolor,ticon,pcolor,ctime) {
   return { symbol, type, lot, entry, exit,profit,time,tcolor,ticon,pcolor,ctime };
@@ -84,18 +85,18 @@ function Portfolio() {
   const isSmallScreen = useMediaQuery('(max-width: 765px)'); // <= 765px
    //backend
    const [tradingData, setTradingData] = useState({
-    Balance: 10000.56,
-    "Margin Level": 2050.15,
-    Equity: 10250.75,
-    "Free Margin": 9750.75,
-    "Total Profit": 500.25,
-    "Win Rate":80.02,
-    "Profit Factor":2.46,
-    "Total Trade":12,
-    "Average Win":1089.77,
-    "Average Loss":-447.90,
-    "Max Drawdown":2047.902,
-    "Sharpe ratio":1.80,
+    Balance: 0,
+    "Margin Level": 0,
+    Equity: 0,
+    "Free Margin": 0,
+    "Total Profit": 0,
+    "Win Rate":0,
+    "Profit Factor":0,
+    "Total Trade":0,
+    "Average Win":0,
+    "Average Loss":0,
+    "Max Drawdown":0,
+    "Sharpe ratio":0,
     "For display graph":[
       // { x: "2025-03-24", y: 2 },
       // { x: "2025-03-23", y: 5.5 },
@@ -104,7 +105,9 @@ function Portfolio() {
       // { x: "2025-03-18", y: 1.5 },
       // { x: "2025-03-18", y: 5 },
     ],
-     "series" : [{ data: [ -200, 300, 500, -300, -100] }],
+    "For Loading":[],
+    
+     "series" : [{ data: [ ] }],
      "Open Position":0,
      "Month Data":[],
      "Days Wise": [
@@ -139,6 +142,7 @@ function Portfolio() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+ const [dataerror,setdataerror] = React.useState(false);
 
   const fetchTradingData = async () => {
     try {
@@ -150,7 +154,23 @@ function Portfolio() {
       }
       
       const response = await axios.get('https://mt4api.frequencee.io/cgi-bin/MT4AccountData.py?FrequenceeID='+accountSel.toLocaleString());
-      
+      if(response.status==200){
+        if(response.data){
+          console.log(response.data);
+          setdataerror(false);
+          
+        }else{
+          console.log("No data found");
+          setdataerror(true);
+          return;
+
+        }
+      }
+      else{
+        console.log("No data found");
+        setdataerror(true);
+        return;
+      }
       // Update state with new data
       setTradingData({
         Balance: response.data.Balance || tradingData.Balance,
@@ -178,7 +198,7 @@ function Portfolio() {
           response.data["DoW PL Info"]["Friday"], 
           
         ] }]
-        ||[{ data: [ -200, 300, 500, -300, -100] }],
+        ||[{ data: [ ] }],
         "Open Position": response.data["Position Info"].length,
         "Days Wise": [
           {
@@ -211,6 +231,8 @@ function Portfolio() {
           }
       ],
        "Month Data":transformDaysData(response.data["DoM PL Info"]) || tradingData["Month Data"],
+       "For Loading":[1],
+
        
        
 
@@ -276,7 +298,11 @@ function Portfolio() {
   const handleChange2 = (event) => {
     setSymobl(event.target.value);
   };
-  if(tradingData["For display graph"].length==0){
+  if(dataerror){
+    return <NoDataFound message={"No data available for ACC"+localStorage.getItem("selectedAccount")}/>;
+  }
+ else
+  if(tradingData["For Loading"].length==0){
     return(
       <Box
       sx={{

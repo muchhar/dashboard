@@ -7,6 +7,7 @@ import PercentIcon from '@mui/icons-material/Percent';
 import SignalCellularAltIcon from '@mui/icons-material/SignalCellularAlt';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import Skeleton from '@mui/material/Skeleton';
+import NoDataFound from "./nodata.jsx";
 
 import PortfolioIcon from '@mui/icons-material/PieChart';
 import BarChartIcon from '@mui/icons-material/BarChart';
@@ -202,13 +203,8 @@ function Analytics() {
   //backend
   const [tradingData, setTradingData] = useState({
     "All Historical Data":[
-          createData('BUY ', 0.1, "$1.08"	,"$1.55", "$12.89","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#22C05C","Mar 17, 2025 22:16"),
-          createData( 'SELL', 1.25, "$1.26	","$1.50", "$39.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C","Mar 17, 2025 22:16"),
-          createData( 'BUY ', 0.01, "$150.50","$200.40", "$-50.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444","Mar 17, 2025 22:16"),
-          createData( 'SELL', 0.15, "$2320.50	","$2430.40", "$500.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C","Mar 17, 2025 22:16"),
-          createData( 'BUY ', 2.0, "$232	","$250", "$-20.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444","Mar 17, 2025 22:16"),
         ],
-        "series" : [{ data: [ -200, 300, 500, -300, -100] }],
+        "series" : [{ data: [ ] }],
         "For display graph":[
      
         ],
@@ -226,12 +222,15 @@ function Analytics() {
              color: '#EF4444'
           }
       ],
-      "Hour Chart":[]
+      "Hour Chart":[],
+      "For Loading":[],
+    
 
 
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+ const [dataerror,setdataerror] = React.useState(false);
 
   const fetchTradingData = async () => {
     try {
@@ -243,6 +242,23 @@ function Analytics() {
       }
       
       const response = await axios.get('https://mt4api.frequencee.io/cgi-bin/MT4AccountData.py?FrequenceeID='+accountSel.toLocaleString());
+      if(response.status==200){
+        if(response.data){
+          console.log(response.data);
+          setdataerror(false);
+          
+        }else{
+          console.log("No data found");
+          setdataerror(true);
+          return;
+
+        }
+      }
+      else{
+        console.log("No data found");
+        setdataerror(true);
+        return;
+      }
       const winLossStats = calculateWinLossPercentage(response.data["All Historical Data"] || []);
 
 
@@ -250,11 +266,6 @@ function Analytics() {
       setTradingData({
         "All Historical Data": transformApiData(response.data["All Historical Data"])||
         [
-          createData('BUY ', 0.1, "$1.08"	,"$1.55", "$12.89","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#22C05C","Mar 17, 2025 22:16"),
-          createData( 'SELL', 1.25, "$1.26	","$1.50", "$39.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C","Mar 17, 2025 22:16"),
-          createData( 'BUY ', 0.01, "$150.50","$200.40", "$-50.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444","Mar 17, 2025 22:16"),
-          createData( 'SELL', 0.15, "$2320.50	","$2430.40", "$500.62","Mar 17, 2025 22:16","#EF4444",CallReceivedIcon,"#22C05C","Mar 17, 2025 22:16"),
-          createData( 'BUY ', 2.0, "$232	","$250", "$-20.62","Mar 17, 2025 22:16","#22C05C",CallMadeIcon,"#EF4444","Mar 17, 2025 22:16"),
         ],
         "series" :[{ data: [ response.data["DoW PL Info"]["Monday"], 
           response.data["DoW PL Info"]["Tuesday"], 
@@ -262,7 +273,7 @@ function Analytics() {
           response.data["DoW PL Info"]["Thursday"],
           response.data["DoW PL Info"]["Friday"], 
           
-        ] }]||[{ data: [ -200, 300, 500, -300, -100] }]
+        ] }]||[{ data: [ ] }]
         ,
         "For display graph": transformGraphData(response.data['For display graph'])['For display graph'] || tradingData["For display graph"],
         "Month Data": transformToMonthlyProfit(response.data["All Historical Data"]) || tradingData["Month Data"],
@@ -279,7 +290,9 @@ function Analytics() {
             color: '#EF4444'
           }
         ] || tradingData["Wining Trade"],
-        "Hour Chart": transformToHourlyProfit(response.data["All Historical Data"] || [])
+        "Hour Chart": transformToHourlyProfit(response.data["All Historical Data"] || []),
+        "For Loading":[1],
+
        
            
     
@@ -384,7 +397,11 @@ function Analytics() {
     barGap: 0, // Minimal gap between bars
     categoryGapRatio: 0.1
   };
-  if(tradingData["For display graph"].length==0){
+  if(dataerror){
+    return <NoDataFound message={"No data available for ACC"+localStorage.getItem("selectedAccount")}/>;
+  }
+ else
+  if(tradingData["For Loading"].length==0){
     return(
       <Box
       sx={{

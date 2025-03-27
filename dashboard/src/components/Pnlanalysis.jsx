@@ -44,6 +44,8 @@ import { dataset2, valueFormatter } from './profit'
 import {  Icon3, Icon4, Icon5, Icon6 } from "./icons"; // Assuming icons are impor
 import Icon1 from '@mui/icons-material/ChevronLeft';
 import Icon2 from '@mui/icons-material/ChevronRight';
+import NoDataFound from "./nodata.jsx";
+
 const series = [{ data: [100, -200, 300, 500, -300, -100] }];
 const transformToHourlyProfit = (trades) => {
   // Initialize hours with 0 profit
@@ -258,6 +260,8 @@ function Pnlanalysis() {
       // { x: "2025-03-18", y: 1.5 },
       // { x: "2025-03-18", y: 5 },
     ],
+    "For Loading":[],
+    
      "series" : [{ data: [ -200, 300, 500, -300, -100] }],
      "profit day":0,
      "unprodit days":0,
@@ -278,6 +282,7 @@ function Pnlanalysis() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+ const [dataerror,setdataerror] = React.useState(false);
 
   const fetchTradingData = async () => {
     try {
@@ -289,7 +294,23 @@ function Pnlanalysis() {
       }
       
       const response = await axios.get('https://mt4api.frequencee.io/cgi-bin/MT4AccountData.py?FrequenceeID='+accountSel.toLocaleString());
-      
+      if(response.status==200){
+        if(response.data){
+          console.log(response.data);
+          setdataerror(false);
+          
+        }else{
+          console.log("No data found");
+          setdataerror(true);
+          return;
+
+        }
+      }
+      else{
+        console.log("No data found");
+        setdataerror(true);
+        return;
+      }
       // Update state with new data
       setTradingData({
         Balance: response.data.Balance || tradingData.Balance,
@@ -333,7 +354,9 @@ function Pnlanalysis() {
         "Calender":response.data["For display graph"].x.map((date, i) => ({ 
           date, 
           profit: response.data["For display graph"].y[i] 
-        })) || []
+        })) || [],
+        "For Loading":[1],
+
         
        
         
@@ -605,7 +628,11 @@ function Pnlanalysis() {
     barGap: 0, // Minimal gap between bars
     categoryGapRatio: 0.1
   };
-  if(tradingData["For display graph"].length==0){
+  if(dataerror){
+    return <NoDataFound message={"No data available for ACC"+localStorage.getItem("selectedAccount")}/>;
+  }
+ else
+  if(tradingData["For Loading"].length==0){
     return(
       <Box
       sx={{
