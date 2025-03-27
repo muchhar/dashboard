@@ -495,7 +495,7 @@ function Pnlanalysis() {
         <span>{day}</span>
         {profit !== null && (
           <span className="mt-0.5 text-[10px]">
-            {profit >= 0 ? `+$${profit}` : `-$${Math.abs(profit)}`}
+            {profit >= 0 ? `+$${profit.toFixed(2)}` : `-$${Math.abs(profit.toFixed(2))}`}
           </span>
         )}
       </div>
@@ -516,7 +516,7 @@ function Pnlanalysis() {
         {day}
         {profit !== null && (
           <span className="mt-0.5 text-[8px]">
-            {profit >= 0 ? `+$${profit}` : `-$${Math.abs(profit)}`}
+            {profit >= 0 ? `+$${profit.toFixed(2)}` : `-$${Math.abs(profit.toFixed(2))}`}
           </span>
         )}
       </button>
