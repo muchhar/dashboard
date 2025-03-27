@@ -16,7 +16,7 @@ import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 import ShowChartOutlinedIcon from '@mui/icons-material/ShowChartOutlined';
 import { LineChart } from '@mui/x-charts/LineChart';
 //import { dataset } from './basicDataset';
-
+import { subDays, isAfter, parseISO } from 'date-fns';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -39,35 +39,69 @@ var x_load=true;
   
 // Function to format date (e.g., "2025-03-24 05:15:34.000" → "Mar 24, 2025 05:15")
 const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  return date.toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch (e) {
+    return 'Invalid date';
+  }
 };
+// const formatDate = (dateString) => {
+//   const date = new Date(dateString);
+//   return date.toLocaleString('en-US', {
+//     month: 'short',
+//     day: 'numeric',
+//     year: 'numeric',
+//     hour: '2-digit',
+//     minute: '2-digit',
+//   });
+// };
 
 // Transform API data into `rows` format
-const transformApiData = (apiData) => {
+// const transformApiData = (apiData) => {
+//   return apiData.map((position) => {
+//     const isBuy = position.type === "BUY";
+    
+//     return {
+//       type: position.type,
+//       lot: position["lot size"],
+//       entry: `$${position["Entry Price"].toFixed(2)}`,
+//       exit: `$${position["Exit Price"].toFixed(2)}`,
+//       profit: `$${position.Profit.toFixed(2)}`,
+//       time: formatDate(position["Open Time"]),
+//       tcolor: isBuy ? "#22C05C" : "#EF4444",
+//       ticon: isBuy ? CallMadeIcon : CallReceivedIcon, // ✅ Valid component
+//       pcolor: position.Profit >= 0 ? "#22C05C" : "#EF4444",
+//     };
+//   });
+// };
+export const transformApiData = (apiData = []) => {
   return apiData.map((position) => {
     const isBuy = position.type === "BUY";
+    const profit = position.Profit || 0;
+    const openTime = position["Open Time"] || new Date().toISOString();
     
     return {
-      type: position.type,
-      lot: position["lot size"],
-      entry: `$${position["Entry Price"].toFixed(2)}`,
-      exit: `$${position["Exit Price"].toFixed(2)}`,
-      profit: `$${position.Profit.toFixed(2)}`,
-      time: formatDate(position["Open Time"]),
+      symbol: position.Symbols || 'N/A',
+      type: position.type || 'N/A',
+      lot: position["lot size"] ? position["lot size"].toFixed(2) : '0.00',
+      entry: position["Entry Price"] ? `$${position["Entry Price"].toFixed(2)}` : '$0.00',
+      exit: position["Exit Price"] ? `$${position["Exit Price"].toFixed(2)}` : '$0.00',
+      profit: `$${profit.toFixed(2)}`,
+      time: formatDate(openTime),
       tcolor: isBuy ? "#22C05C" : "#EF4444",
-      ticon: isBuy ? CallMadeIcon : CallReceivedIcon, // ✅ Valid component
-      pcolor: position.Profit >= 0 ? "#22C05C" : "#EF4444",
+      ticon: isBuy ? CallMadeIcon : CallReceivedIcon,
+      pcolor: profit >= 0 ? "#22C05C" : "#EF4444",
+      rawDate: parseISO(openTime) // Store as Date object for filtering
     };
   });
 };
-
 function createData( type, lot, entry, exit,profit,time,tcolor,ticon,pcolor) {
   return {  type, lot, entry, exit,profit,time,tcolor,ticon,pcolor };
 }
@@ -147,7 +181,8 @@ function transformGraphData(apiData) {
 }
 
 function Dashboard() {
-  const [Period, setPeriod] = React.useState('');
+  const [Period, setPeriod] = React.useState(30);
+  const [filteredData, setFilteredData] = useState([]);
   const [Symbols, setSymobl] = React.useState('');
   const [colorX, setColorX] = React.useState('piecewise');
   const [colorY, setColorY] = React.useState('None');
@@ -310,8 +345,38 @@ function Dashboard() {
   // Determine the number of cards per row based on screen size
   const cardsPerRow = isLargeScreen ? 4 : isMediumScreen ? 2 : 1;
   const isWideScreen = useMediaQuery('(min-width: 1024px)'); // Check if screen width is >= 1024
+  useEffect(() => {
+    if (!tradingData?.['Position Info']) return;
+
+    const today = new Date();
+    let startDate;
+
+    switch(Period) {
+      case 10: // Today
+        startDate = subDays(today, 1);
+        break;
+      case 20: // This Week
+        startDate = subDays(today, 7);
+        break;
+      case 30: // This Month
+      default:
+        startDate = subDays(today, 30);
+    }
+
+    const filtered = tradingData['Position Info'].filter(position => {
+      if (!position?.rawDate) return false;
+      const positionDate = new Date(position.rawDate);
+      return isAfter(positionDate, startDate);
+    });
+
+    setFilteredData(filtered);
+  }, [Period, tradingData]);
+
+  const handlePeriodChange = (event) => {
+  };
   const handleChange = (event) => {
-    setPeriod(event.target.value);
+    setPeriod(Number(event.target.value));
+    
   };
   const handleChange2 = (event) => {
     setSymobl(event.target.value);
@@ -638,7 +703,7 @@ function Dashboard() {
       </TableRow>
     </TableHead>
     <TableBody>
-      {tradingData['Position Info'].map((row) => (
+      {filteredData.map((row) => (
         <TableRow key={row.symbol}>
           <TableCell align="right">
   <Box display="flex" justifyContent="flex-end" alignItems="center">
