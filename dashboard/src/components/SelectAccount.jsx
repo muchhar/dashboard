@@ -38,7 +38,13 @@ const AccountSelector = () => {
     localStorage.setItem("selectedAccount", account);
     
     setIsOpen(false);
-    window.location.reload(); // Redirect to trading page (adjust as needed)
+    if (window.location.pathname === "/") {
+      // Force reload if already on home page
+      window.location.reload();
+    } else {
+      // Navigate to home if on another page
+      navigate("/");
+    }
   };
 
   return (
