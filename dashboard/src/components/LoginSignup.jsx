@@ -51,7 +51,7 @@ export default function LoginSignup() {
           localStorage.setItem('mt4_token', response.data.token);
           navigate('/');
           // You might want to redirect or do something after successful login
-          alert('Login successful!');
+        //  alert('Login successful!');
         } else {
           setError('No token received');
         }
