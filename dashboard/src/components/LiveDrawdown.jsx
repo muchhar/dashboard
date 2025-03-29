@@ -14,6 +14,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { PlusIcon } from "./PlusIcon";
 import Skeleton from '@mui/material/Skeleton';
 import NoDataFound from "./nodata.jsx";
+import api from '../utils/api';
 
 const LiveDropdown = () => {
   const [tabValue, setTabValue] = useState(0);
@@ -54,9 +55,11 @@ const LiveDropdown = () => {
   useEffect(() => {
     const fetchAccountNumbers = async () => {
       try {
-        const response = await axios.get(
-          'https://mt4api.frequencee.io/cgi-bin/MT4AccountList.py'
-        );
+        const response = await api.get('/cgi-bin/MT4AccountList.py');
+      
+        // const response = await axios.get(
+        //   'https://mt4api.frequencee.io/cgi-bin/MT4AccountList.py'
+        // );
         setAccountNumbers(response.data);
       } catch (err) {
         console.error('Failed to load account numbers:', err);
@@ -74,9 +77,12 @@ const LiveDropdown = () => {
       try {
         setLoading(true);
         const promises = accountNumbers.map(async (accountNumber) => {
-          const response = await axios.get(
-            `https://mt4api.frequencee.io/cgi-bin/MT4AccountData.py?FrequenceeID=${accountNumber}`
-          );
+          // const response = await axios.get(
+
+          //   `https://mt4api.frequencee.io/cgi-bin/MT4AccountData.py?FrequenceeID=${accountNumber}`
+          // );
+          const response = await api.get(`/cgi-bin/MT4AccountData.py?FrequenceeID=${accountNumber.toLocaleString()}`);
+      
           if(response.status==200){
             if(response.data){
               console.log(response.data);

@@ -19,6 +19,7 @@ import { PieChart } from '@mui/x-charts/PieChart';
 import { dataset2 } from './profit';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import NoDataFound from "./nodata.jsx";
+import api from '../utils/api';
 
 function createData(symbol, type, lot, entry, exit,profit,time,tcolor,ticon,pcolor,ctime) {
   return { symbol, type, lot, entry, exit,profit,time,tcolor,ticon,pcolor,ctime };
@@ -152,8 +153,9 @@ function Portfolio() {
       if (account) {
         accountSel=account;
       }
+      const response = await api.get(`/cgi-bin/MT4AccountData.py?FrequenceeID=${accountSel.toLocaleString()}`);
       
-      const response = await axios.get('https://mt4api.frequencee.io/cgi-bin/MT4AccountData.py?FrequenceeID='+accountSel.toLocaleString());
+      //const response = await axios.get('https://mt4api.frequencee.io/cgi-bin/MT4AccountData.py?FrequenceeID='+accountSel.toLocaleString());
       if(response.status==200){
         if(response.data){
           console.log(response.data);

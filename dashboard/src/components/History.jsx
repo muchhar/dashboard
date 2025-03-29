@@ -11,6 +11,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import api from '../utils/api';
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -63,7 +64,9 @@ function History() {
     try {
       setIsLoading(true);
       const account = localStorage.getItem("selectedAccount") || 103;
-      const response = await axios.get(`https://mt4api.frequencee.io/cgi-bin/MT4AccountData.py?FrequenceeID=${account}`);
+      const response = await api.get(`/cgi-bin/MT4AccountData.py?FrequenceeID=${account.toLocaleString()}`);
+      
+      //const response = await axios.get(`https://mt4api.frequencee.io/cgi-bin/MT4AccountData.py?FrequenceeID=${account}`);
       
       if (response.status === 200 && response.data) {
         setDataError(false);

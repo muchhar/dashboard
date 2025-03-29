@@ -8,6 +8,7 @@ import SignalCellularAltIcon from '@mui/icons-material/SignalCellularAlt';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import { PieChart } from '@mui/x-charts/PieChart';
 import Skeleton from '@mui/material/Skeleton';
+import api from '../utils/api';
 
 import PortfolioIcon from '@mui/icons-material/PieChart';
 import BarChartIcon from '@mui/icons-material/BarChart';
@@ -292,8 +293,9 @@ function Pnlanalysis() {
       if (account) {
         accountSel=account;
       }
+      const response = await api.get(`/cgi-bin/MT4AccountData.py?FrequenceeID=${accountSel.toLocaleString()}`);
       
-      const response = await axios.get('https://mt4api.frequencee.io/cgi-bin/MT4AccountData.py?FrequenceeID='+accountSel.toLocaleString());
+     // const response = await axios.get('https://mt4api.frequencee.io/cgi-bin/MT4AccountData.py?FrequenceeID='+accountSel.toLocaleString());
       if(response.status==200){
         if(response.data){
           console.log(response.data);
