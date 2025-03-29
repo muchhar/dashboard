@@ -19,6 +19,7 @@ import LoginSignup from './components/LoginSignup';
 import Appbar from './components/Appbar'
 import AccountSelector from './components/SelectAccount';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import ProtectedRoute from './components/ProtectedRoute';
 
 function DashboardPage() {
   return <Dashboard/>;
@@ -94,48 +95,44 @@ function App() {
       <Appbar />
       <AccountSelector/>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/trade-history" element={<History />} />
-        <Route path="/analytics" element={<Analytics />} />
-        <Route path="/portfolio" element={<Portfolio />} />
-        <Route path="/pnl-analysis" element={<Pnlanalysis />} />
-        <Route path="/live-drawdown" element={<LiveDropdown />} />
-        <Route path="/settings" element={<Settings />} />
+        <Route path="/" element={
+          <ProtectedRoute>
+          <Dashboard />
+          </ProtectedRoute>
+          } />
+        <Route path="/trade-history" element={
+          <ProtectedRoute>
+          <History />
+          </ProtectedRoute>
+          } />
+        <Route path="/analytics" element={
+          <ProtectedRoute>
+          <Analytics />
+          </ProtectedRoute>
+          } />
+        <Route path="/portfolio" element={
+          <ProtectedRoute>
+          <Portfolio />
+          </ProtectedRoute>
+          } />
+        <Route path="/pnl-analysis" element={
+          <ProtectedRoute>
+          <Pnlanalysis />
+          </ProtectedRoute>
+          } />
+        <Route path="/live-drawdown" element={
+          <ProtectedRoute>
+          <LiveDropdown />
+          </ProtectedRoute>
+          } />
+        <Route path="/settings" element={
+          <ProtectedRoute>
+          <Settings />
+          </ProtectedRoute>
+          } />
         <Route path="/login-signup" element={<LoginSignup />} />
       </Routes>
     </Router>
-  //     <div className="App" sx={{mt:6}}>
-  //       {/* Fixed SidePanel */}
-  //       {/* <SidePanel 
-  //        onPageChange={handlePageChange}
-  //        selectedPage={selectedPage}
-  //        drawerOpen={!isMobile || drawerOpen}
-  //        drawerWidth={isMobile ? 240 : 240}
-  //        toggleDrawer={toggleDrawer}
-  //       />
-  //  */}
-  //       {/* Main container including TopAppBar and content */}
-  //       {/* <Box
-  //         component="main"
-  //         sx={{
-  //           //flexGrow: 1,
-  //          // marginLeft: isMobile ? 0 : '0px', 
-  //         //  marginLeft: '240px', // Offset by the width of the SidePanel
-  //         }}
-  //       >
-  //         {/* TopAppBar inside the main container  */}
-  //         {/* <TopAppBar toggleDrawer={toggleDrawer}/> */}
-  //         <Appbar sx={{}}/>
-  //         {/* <Divider></Divider>
-  //          */}
-  //         {/* Content area */}
-  //         <Box  sx={{ pl: 3, mt: 1 }}> {/* Add padding and margin top to account for the app bar height */}
-  //           <Container>
-  //             {renderPage()} {/* Render the selected page */}
-  //           </Container>
-  //         </Box>
-  //       {/* </Box> */}
-  //     </div>
     );
   }
 export default App

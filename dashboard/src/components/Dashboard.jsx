@@ -33,6 +33,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import { BarChart } from '@mui/x-charts/BarChart';
 import NoDataFound from "./nodata.jsx";
+import api from '../utils/api';
 // Function to format numbers as currency
 const formatCurrency = (value) => `$${value.toFixed(2)}`;
 var x_load=true;
@@ -250,8 +251,8 @@ function Dashboard() {
         accountSel=account;
       }
       console.log(accountSel);
-      
-      const response = await axios.get('https://mt4api.frequencee.io/cgi-bin/MT4AccountData.py?FrequenceeID='+accountSel.toLocaleString());
+      const response = await api.get(`/cgi-bin/MT4AccountData.py?FrequenceeID=${accountSel.toLocaleString()}`);
+      //const response = await axios.get('https://mt4api.frequencee.io/cgi-bin/MT4AccountData.py?FrequenceeID='+accountSel.toLocaleString());
       console.log(response.status);
       if(response.status==200){
         if(response.data){
