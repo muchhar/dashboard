@@ -33,7 +33,7 @@ export default function LoginSignup() {
       try {
         setLoading(true);
         const response = await axios.post(
-          'https://corsproxy.io/?https://mt4api.frequencee.io/cgi-bin/MT4APIToken.py',
+          'https://mt4api.frequencee.io/cgi-bin/MT4APIToken.py',
           {
             username: formData.username,
             password: formData.password
