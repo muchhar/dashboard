@@ -41,7 +41,6 @@ export default function LoginSignup() {
           {
             headers: {
               'Content-Type': 'application/json',
-              'x-requested-with': 'XMLHttpRequest'
             }
           }
         );console.log(response.data);
