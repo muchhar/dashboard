@@ -32,12 +32,19 @@ export default function LoginSignup() {
     if (isLogin) {
       try {
         setLoading(true);
-        const response = await axios.post('https://mt4api.frequencee.io/cgi-bin/MT4APIToken.py', {
-                                          
-          username: formData.username,
-          password: formData.password
-        });
-        console.log(response.data);
+        const response = await axios.post(
+          'https://corsproxy.io/?https://mt4api.frequencee.io/cgi-bin/MT4APIToken.py',
+          {
+            username: formData.username,
+            password: formData.password
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'x-requested-with': 'XMLHttpRequest'
+            }
+          }
+        );console.log(response.data);
         if (response.data.token) {
           // Store credentials and token in localStorage
           localStorage.setItem('mt4_username', formData.username);
