@@ -67,8 +67,13 @@ function History() {
       const response = await api.get(`/cgi-bin/MT4AccountData.py?FrequenceeID=${account.toLocaleString()}`);
       
       //const response = await axios.get(`https://mt4api.frequencee.io/cgi-bin/MT4AccountData.py?FrequenceeID=${account}`);
-      
       if (response.status === 200 && response.data) {
+        if (response.data.error) {
+          setDataError(true);
+          return;
+
+        }
+        
         setDataError(false);
         setTradingData({
           ...response.data,

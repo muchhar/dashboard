@@ -22,7 +22,7 @@ const AppBar = () => {
   }, []);
 
   return (
-    <div className={`sticky fixed top-[20px] left-0 right-0 z-50 flex flex-row mt-[20px] ${isLargeScreen ? 'ml-[50px] mr-[50px]' : 'ml-[10px] mr-[10px]'} h-[62.5px] px-6 bg-[#212525] rounded-[100px] text-white text-base leading-6 font-inter`}>
+    <div className={`sticky fixed top-[20px] left-0 right-0 z-50 flex flex-row mt-[20px] ${isLargeScreen ? 'ml-[10px] mr-[10px]' : 'ml-[10px] mr-[10px]'} h-[62.5px] px-6 bg-[#212525] rounded-[100px] text-white text-base leading-6 font-inter`}>
       {/* Logo Section */}
       <div className="flex items-center">
         <a

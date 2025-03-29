@@ -100,6 +100,11 @@ const LiveDropdown = () => {
             setdataerror(true);
             return;
           }
+          if (response.data.error) {
+            return;
+  
+          }
+          
           return {
             accountId: `ACC${accountNumber}`,
             ...response.data

@@ -157,6 +157,12 @@ function Portfolio() {
       
       //const response = await axios.get('https://mt4api.frequencee.io/cgi-bin/MT4AccountData.py?FrequenceeID='+accountSel.toLocaleString());
       if(response.status==200){
+        if (response.data.error) {
+          setdataerror(true);
+          return;
+
+        }
+        
         if(response.data){
           console.log(response.data);
           setdataerror(false);

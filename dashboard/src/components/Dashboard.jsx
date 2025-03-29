@@ -252,9 +252,13 @@ function Dashboard() {
       }
       const response = await api.get(`/cgi-bin/MT4AccountData.py?FrequenceeID=${accountSel.toLocaleString()}`);
        //const response = await axios.get('https://mt4api.frequencee.io/cgi-bin/MT4AccountData.py?FrequenceeID='+accountSel.toLocaleString());
-      console.log(response.status);
       if(response.status==200){
-        if(response.data){
+        if (response.data.error) {
+          setdataerror(true);
+          return;
+
+        }
+        else if(response.data){
           console.log(response.data);
           setdataerror(false);
           
