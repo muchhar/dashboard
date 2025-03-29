@@ -45,7 +45,7 @@ const AccountSelector = () => {
         if (error.response?.status === 401) {
           // Token expired or invalid
           localStorage.removeItem('mt4_token');
-          navigate('/login');
+          navigate('/login-signup');
         }
       }
     };

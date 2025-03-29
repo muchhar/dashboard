@@ -49,7 +49,7 @@ export default function LoginSignup() {
           localStorage.setItem('mt4_username', formData.username);
           localStorage.setItem('mt4_password', formData.password);
           localStorage.setItem('mt4_token', response.data.token);
-          navigate('/dashboard');
+          navigate('/');
           // You might want to redirect or do something after successful login
           alert('Login successful!');
         } else {
