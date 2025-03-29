@@ -34,6 +34,7 @@ import ScheduleIcon from '@mui/icons-material/Schedule';
 import { BarChart } from '@mui/x-charts/BarChart';
 import NoDataFound from "./nodata.jsx";
 import api from '../utils/api';
+import { useNavigate } from 'react-router-dom';
 // Function to format numbers as currency
 const formatCurrency = (value) => `$${value.toFixed(2)}`;
 var x_load=true;
@@ -188,6 +189,7 @@ function Dashboard() {
   const [colorX, setColorX] = React.useState('piecewise');
   const [colorY, setColorY] = React.useState('None');
   const [dataerror,setdataerror] = React.useState(false);
+  const navigate = useNavigate();
 
   //backend
   const [tradingData, setTradingData] = useState({
@@ -268,6 +270,16 @@ function Dashboard() {
           return;
 
         }
+      }
+      else if(response.status==401){
+        localStorage.removeItem('mt4_token');
+       localStorage.removeItem('mt4_username');
+       localStorage.removeItem('selectedAccount');
+       localStorage.removeItem('mt4_password');
+          
+      navigate('/login-signup');
+      alert('Session expired. Please login again.');
+  
       }
       else{
         console.log("No data found");

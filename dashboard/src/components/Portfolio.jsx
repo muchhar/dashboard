@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Skeleton from '@mui/material/Skeleton';
-
+import { useNavigate } from 'react-router-dom';
 import { Box, Container, Typography, Card, CardContent, Divider, Stack ,Button,useMediaQuery,Grid} from '@mui/material';
 import ShowChartIcon from '@mui/icons-material/TrendingUp';
 import PnlIcon from '@mui/icons-material/AttachMoneyTwoTone';
@@ -79,7 +79,8 @@ const tab2rows = [
 function Portfolio() {
   const [Symbols, setSymobl] = React.useState('');
   const [Period, setPeriod] = React.useState('');
-    
+  const navigate = useNavigate();
+
    const isWideScreen = useMediaQuery('(min-width: 1024px)'); // Check if screen width is >= 1024px  
    const isLargeScreen = useMediaQuery('(min-width: 1024px)'); // >= 1024px
   const isMediumScreen = useMediaQuery('(min-width: 766px) and (max-width: 1023px)'); // 766px - 1023px
@@ -173,6 +174,16 @@ function Portfolio() {
           return;
 
         }
+      }
+      else if(response.status==401){
+        localStorage.removeItem('mt4_token');
+       localStorage.removeItem('mt4_username');
+       localStorage.removeItem('selectedAccount');
+       localStorage.removeItem('mt4_password');
+          
+      navigate('/login-signup');
+      alert('Session expired. Please login again.');
+  
       }
       else{
         console.log("No data found");

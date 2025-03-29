@@ -9,7 +9,7 @@ import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import Skeleton from '@mui/material/Skeleton';
 import NoDataFound from "./nodata.jsx";
 import api from '../utils/api';
-
+import { useNavigate } from 'react-router-dom';
 import PortfolioIcon from '@mui/icons-material/PieChart';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import FunctionsIcon from '@mui/icons-material/Functions';
@@ -202,6 +202,8 @@ function Analytics() {
   const [colorX, setColorX] = React.useState('piecewise');
   const [colorY, setColorY] = React.useState('None');
   //backend
+  const navigate = useNavigate();
+
   const [tradingData, setTradingData] = useState({
     "All Historical Data":[
         ],
@@ -261,6 +263,15 @@ function Analytics() {
           return;
 
         }
+      }else if(response.status==401){
+        localStorage.removeItem('mt4_token');
+       localStorage.removeItem('mt4_username');
+       localStorage.removeItem('selectedAccount');
+       localStorage.removeItem('mt4_password');
+          
+      navigate('/login-signup');
+      alert('Session expired. Please login again.');
+  
       }
       else{
         console.log("No data found");

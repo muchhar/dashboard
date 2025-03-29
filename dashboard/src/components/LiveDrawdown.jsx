@@ -15,7 +15,7 @@ import { PlusIcon } from "./PlusIcon";
 import Skeleton from '@mui/material/Skeleton';
 import NoDataFound from "./nodata.jsx";
 import api from '../utils/api';
-
+import { useNavigate } from 'react-router-dom';
 const LiveDropdown = () => {
   const [tabValue, setTabValue] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
@@ -26,6 +26,7 @@ const LiveDropdown = () => {
     unit: '%',
     value: ''
   });
+  const navigate = useNavigate();
 
   // Account data states
   const [accountNumbers, setAccountNumbers] = useState([]);
@@ -60,6 +61,16 @@ const LiveDropdown = () => {
         // const response = await axios.get(
         //   'https://mt4api.frequencee.io/cgi-bin/MT4AccountList.py'
         // );
+         if(response.status==401){
+          localStorage.removeItem('mt4_token');
+         localStorage.removeItem('mt4_username');
+         localStorage.removeItem('selectedAccount');
+         localStorage.removeItem('mt4_password');
+            
+        navigate('/login-signup');
+        alert('Session expired. Please login again.');
+    
+        }
         setAccountNumbers(response.data);
       } catch (err) {
         console.error('Failed to load account numbers:', err);
@@ -94,6 +105,16 @@ const LiveDropdown = () => {
               return;
     
             }
+          }
+          else if(response.status==401){
+            localStorage.removeItem('mt4_token');
+           localStorage.removeItem('mt4_username');
+           localStorage.removeItem('selectedAccount');
+           localStorage.removeItem('mt4_password');
+              
+          navigate('/login-signup');
+          alert('Session expired. Please login again.');
+      
           }
           else{
             console.log("No data found");

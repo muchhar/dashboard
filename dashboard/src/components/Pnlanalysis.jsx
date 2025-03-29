@@ -9,7 +9,7 @@ import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import { PieChart } from '@mui/x-charts/PieChart';
 import Skeleton from '@mui/material/Skeleton';
 import api from '../utils/api';
-
+import { useNavigate } from 'react-router-dom';
 import PortfolioIcon from '@mui/icons-material/PieChart';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import FunctionsIcon from '@mui/icons-material/Functions';
@@ -232,6 +232,8 @@ const profitData = [
 ];
 
 function Pnlanalysis() {
+  const navigate = useNavigate();
+
   const [Period, setPeriod] = React.useState('');
   const [Symbols, setSymobl] = React.useState('');
   const [Date2, setDate] = React.useState('');
@@ -313,6 +315,16 @@ function Pnlanalysis() {
           return;
 
         }
+      }
+      else if(response.status==401){
+        localStorage.removeItem('mt4_token');
+       localStorage.removeItem('mt4_username');
+       localStorage.removeItem('selectedAccount');
+       localStorage.removeItem('mt4_password');
+          
+      navigate('/login-signup');
+      alert('Session expired. Please login again.');
+  
       }
       else{
         console.log("No data found");

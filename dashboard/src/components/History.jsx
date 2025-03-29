@@ -12,7 +12,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import api from '../utils/api';
-
+import { useNavigate } from 'react-router-dom';
 const formatDate = (dateString) => {
   const date = new Date(dateString);
   return date.toLocaleString('en-US', {
@@ -55,7 +55,8 @@ function History() {
     "All Historical Data": [],
     "For Loading": []
   });
-  
+  const navigate = useNavigate();
+
   const [isLoading, setIsLoading] = useState(true);
   const [dataerror, setDataError] = useState(false);
   const isWideScreen = useMediaQuery('(min-width: 766px)');
@@ -80,7 +81,18 @@ function History() {
           "All Historical Data": transformApiData(response.data["All Historical Data"] || []),
           "For Loading": [1]
         });
-      } else {
+      }
+      else if(response.status==401){
+        localStorage.removeItem('mt4_token');
+       localStorage.removeItem('mt4_username');
+       localStorage.removeItem('selectedAccount');
+       localStorage.removeItem('mt4_password');
+          
+      navigate('/login-signup');
+      alert('Session expired. Please login again.');
+  
+      }
+      else {
         setDataError(true);
       }
     } catch (err) {
