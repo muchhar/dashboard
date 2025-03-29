@@ -1,39 +1,30 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import api from "../utils/api"; // Use your configured axios instance
+import api from "../utils/api";
 
 const AccountSelector = () => {
   const [accounts, setAccounts] = useState([]);
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // First check authentication status
   useEffect(() => {
     const token = localStorage.getItem('mt4_token');
-    if (token) {
-      setIsAuthenticated(true);
-    } else {
-      // Redirect to login if not authenticated
+    if (!token) {
       navigate('/login-signup');
+      return;
     }
-  }, [navigate]);
-
-  // Only fetch accounts if authenticated
-  useEffect(() => {
-    if (!isAuthenticated) return;
 
     const fetchAccounts = async () => {
       try {
-        const response = await api.get(
-          "/cgi-bin/MT4AccountList.py"
-        );
+        setLoading(true);
+        const response = await api.get("/cgi-bin/MT4AccountList.py");
+        
+        if (!response.data) throw new Error("No data received");
         
         setAccounts(response.data);
         
-        // Set account from storage or first available
         const savedAccount = localStorage.getItem("selectedAccount");
         setSelectedAccount(
           savedAccount && response.data.includes(Number(savedAccount))
@@ -41,39 +32,32 @@ const AccountSelector = () => {
             : response.data[0]
         );
       } catch (error) {
-        console.error("Error fetching accounts:", error);
+        console.error("Account fetch error:", error);
         if (error.response?.status === 401) {
-          // Token expired or invalid
           localStorage.removeItem('mt4_token');
           navigate('/login-signup');
         }
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchAccounts();
-  }, [isAuthenticated, navigate]);
+  }, [navigate]);
 
   const handleAccountSelect = (account) => {
     setSelectedAccount(account);
     localStorage.setItem("selectedAccount", account.toString());
     setIsOpen(false);
-    
-    if (window.location.pathname === "/") {
-      window.location.reload();
-    } else {
-      navigate("/");
-    }
+    window.location.reload(); // Always refresh to ensure data consistency
   };
 
-  // Don't render anything if not authenticated
-  if (!isAuthenticated) return null;
+  if (loading) return null; // Or return a loading spinner
 
-  // Don't render if no accounts loaded yet
-  if (accounts.length === 0) return null;
+  
 
   return (
     <div className="fixed bottom-6 right-6 z-50">
-      {/* Circular Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center justify-center bg-[#80ee64] hover:bg-[#6ed653] text-black font-inter font-semibold rounded-full h-14 w-14 shadow-lg transition-all duration-300"
@@ -81,7 +65,6 @@ const AccountSelector = () => {
         {selectedAccount || "?"}
       </button>
 
-      {/* Account Selection Panel */}
       {isOpen && (
         <div className="absolute bottom-full right-0 mb-4 p-2 bg-[#151818] border border-[#637260] rounded-lg shadow-lg flex gap-2">
           {accounts.map((account) => (
